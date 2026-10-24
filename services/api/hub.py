@@ -77,9 +77,14 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def live_call_mode() -> bool:
+    """CS_CALL_MODE=live is the only setting that dials the configured number."""
+    return os.environ.get("CS_CALL_MODE", "").strip().lower() == "live"
+
+
 def scripted_call_mode() -> bool:
-    """CS_CALL_MODE=scripted: no phone call; the on-screen 911 call is scripted."""
-    return os.environ.get("CS_CALL_MODE", "").strip().lower() == "scripted"
+    """Demo recording: the on-screen 911 conversation. Unset does not dial."""
+    return not live_call_mode()
 
 
 def _scripted(rec: Any) -> bool:
@@ -234,14 +239,32 @@ class DemoHub:
                     )
                 )
                 return False
+            if not operator_requested and not _real_weapon_detection(rec):
+                return False
             from services.voice.signalwire_bridge import load_config, place_call
 
             provider = load_config()
             ok, reason = DEFAULT_GUARDRAILS.can_dispatch(rec.incident_id)
             if ok and provider and _scripted(rec) and not operator_requested:
-                # With real calling on, a scripted scenario gets no voice at
-                # all: no call, and no simulated line holding voice busy.
+                # A scenario playback never places a call.
                 ok, reason = False, "scripted_scenario"
+            if (
+                getattr(rec, "class_token", None) is IncidentClass.WEAPON
+                and not _scripted(rec)
+            ):
+                from services.brain.track_ai import configured, review_dispatch
+
+                if configured():
+                    # BeeAI applies the local rules and the Guardian result.
+                    # This does not place a call; the existing branch below does
+                    # only when this decision allows it.
+                    try:
+                        ok, reason = await asyncio.to_thread(
+                            review_dispatch, rec, ok, reason
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        print(f"[track] review failed: {type(exc).__name__}", flush=True)
+                        ok, reason = False, "guardian_failed"
             if not ok:
                 await self.publish(
                     DemoControl(
@@ -262,8 +285,12 @@ class DemoHub:
             now = _utcnow()
             rec.state = IncidentState.DISPATCHED
             rec.updated_at = now
-            signalwire = (
-                provider if _real_weapon_detection(rec) and not scripted_call_mode() else None
+            # Phone audio only when live mode is explicit, and only to the
+            # number already in the provider config. Demo recording never dials.
+            dial = bool(
+                live_call_mode()
+                and provider
+                and _real_weapon_detection(rec)
             )
             await self.publish(
                 IncidentStateChange(
@@ -271,23 +298,20 @@ class DemoHub:
                     state=IncidentState.DISPATCHED,
                     severity=Severity.SEVERE,
                     ts=now,
-                    note="SignalWire call started" if signalwire else "Simulated call started",
+                    note="SignalWire call started" if dial else "911 call started",
                 )
             )
             await self._publish_brief(brief, "dispatch")
-            if scripted_call_mode():
-                # Demo recording: the whole 911 call is scripted to the clip.
-                await self._voice_agent().start_scripted_call(rec)
+            if not dial:
+                # Demo recording, or a call with no phone line: on-screen
+                # conversation only. place_call is not used.
+                await self._voice_agent().start_scripted_call(rec, brief)
                 self._log_call(rec.incident_id, "scripted")
-                return True
-            if not signalwire:
-                await self._voice_agent().start_call(rec, brief)
-                self._log_call(rec.incident_id, "simulated")
                 return True
             await self._voice_agent().start_live_call(rec, brief)
             placed = False
             try:
-                result = await asyncio.to_thread(place_call, rec.incident_id, config=signalwire)
+                result = await asyncio.to_thread(place_call, rec.incident_id, config=provider)
                 placed = bool(result.get("ok"))
                 if placed:
                     self._call_sid = str(result.get("call_sid") or "") or None

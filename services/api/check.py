@@ -269,6 +269,9 @@ async def main() -> None:
             self.active = True
             self.starts += 1
 
+        async def start_scripted_call(self, _rec, _brief=None):
+            await self.start_call(_rec, _brief)
+
         async def start_live_call(self, _rec, _brief):
             await self.start_call(_rec, _brief)
 
@@ -286,6 +289,8 @@ async def main() -> None:
     hits_before = list(DEFAULT_GUARDRAILS._hour_hits)
     first = replace(automatic, incident_id="concurrent-1", state=IncidentState.ALERTED)
     second = replace(automatic, incident_id="concurrent-2", state=IncidentState.ALERTED)
+    saved_mode = os.environ.get("CS_CALL_MODE")
+    os.environ["CS_CALL_MODE"] = "scripted"
     try:
         await asyncio.gather(
             srv.hub._maybe_start_voice(first),
@@ -295,6 +300,10 @@ async def main() -> None:
         assert [first.state, second.state].count(IncidentState.DISPATCHED) == 1
         assert [first.state, second.state].count(IncidentState.ALERTED) == 1
     finally:
+        if saved_mode is None:
+            os.environ.pop("CS_CALL_MODE", None)
+        else:
+            os.environ["CS_CALL_MODE"] = saved_mode
         DEFAULT_GUARDRAILS._dispatched = dispatched_before
         DEFAULT_GUARDRAILS._hour_hits = hits_before
         srv.hub.broadcast = original_broadcast
@@ -317,6 +326,9 @@ async def main() -> None:
 
         async def start_call(self, _rec, _brief):
             self.active = True
+
+        async def start_scripted_call(self, rec, brief=None):
+            await self.start_call(rec, brief)
 
         async def start_live_call(self, rec, brief):
             await self.start_call(rec, brief)
@@ -349,7 +361,7 @@ async def main() -> None:
             state=IncidentState.ALERTED,
             rules_fired=["weapon"],
         )
-        await srv.hub._maybe_start_voice(rec)
+        await srv.hub._maybe_start_voice(rec, operator_requested=True)
         briefs = [e for e in sent_env if e["type"] == "call.brief"]
         assert len(briefs) == 1 and briefs[0]["reason"] == "dispatch"
         assert briefs[0]["incident_id"] == "brief-1" and briefs[0]["ts"]
@@ -403,6 +415,7 @@ async def main() -> None:
     sent_env.clear()
     srv.hub.broadcast = capture
     srv.hub._voice = None
+    saved_mode = os.environ.get("CS_CALL_MODE")
     try:
         for unknown in ("full", "quiet", "medical_fall", "nope"):
             reply = await srv.hub.handle_cmd({"cmd": "runScenario", "scenario_id": unknown})
@@ -423,22 +436,36 @@ async def main() -> None:
             state=IncidentState.ALERTED,
             rules_fired=["weapon"],
         )
+        os.environ["CS_CALL_MODE"] = "scripted"
+        outcomes[:] = [{"ok": True, "call_sid": "CA-would-dial"}]
+        await srv.hub._on_incident(vision)
+        assert placed == [], "demo recording must not dial"
+        assert srv.hub._voice_agent().busy(), "a severe weapon starts the on-screen call"
+        await srv.hub._voice_agent().cancel()
+        os.environ["CS_CALL_MODE"] = "live"
+        DEFAULT_GUARDRAILS._dispatched.clear()
         outcomes[:] = [{"ok": False, "reason": "http_500"}]
         await srv.hub._on_incident(vision)
         assert placed == ["vision-real-1"]
         assert not srv.hub._voice_agent().busy(), "failed call must not leave voice busy"
         DEFAULT_GUARDRAILS._dispatched.clear()
         outcomes[:] = [TimeoutError("signalwire")]
-        await srv.hub._on_incident(replace(vision, incident_id="vision-real-2", state=IncidentState.ALERTED))
+        second = replace(vision, incident_id="vision-real-2", state=IncidentState.ALERTED)
+        await srv.hub._on_incident(second)
         assert placed[-1] == "vision-real-2" and not srv.hub._voice_agent().busy()
         DEFAULT_GUARDRAILS._dispatched.clear()
         outcomes[:] = [{"ok": True, "call_sid": "CA-check"}]
-        await srv.hub._on_incident(replace(vision, incident_id="vision-real-3", state=IncidentState.ALERTED))
+        third = replace(vision, incident_id="vision-real-3", state=IncidentState.ALERTED)
+        await srv.hub._on_incident(third)
         assert placed[-1] == "vision-real-3" and srv.hub._voice_agent().busy()
         assert "signalwire_call:CA-check" in [e.get("scenario_id") for e in sent_env]
         await srv.hub.reset()
         assert not srv.hub._voice_agent().busy()
     finally:
+        if saved_mode is None:
+            os.environ.pop("CS_CALL_MODE", None)
+        else:
+            os.environ["CS_CALL_MODE"] = saved_mode
         sw.load_config, sw.place_call = saved_sw
         DEFAULT_GUARDRAILS._dispatched = dispatched_before
         DEFAULT_GUARDRAILS._hour_hits = hits_before
@@ -609,7 +636,6 @@ async def main() -> None:
     server.close()
     await server.wait_closed()
     await srv.hub.stop_loops()
-    import os
     from services.api.vision_bridge import vision_enabled, VisionBridge
     assert vision_enabled() is False
     class _Hub:

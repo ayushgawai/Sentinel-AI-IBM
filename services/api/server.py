@@ -187,6 +187,11 @@ class ApiServer:
         if method == "GET" and (path == "/health" or path.startswith("/health?")):
             await self._http_json(writer, 200, {"ok": True, "service": "api"})
             return
+        if method == "GET" and (path == "/api/track" or path.startswith("/api/track?")):
+            from services.brain.track_ai import public_status
+
+            await self._http_json(writer, 200, public_status())
+            return
         if method == "GET" and (path == "/api/site" or path.startswith("/api/site?")):
             await self._http_json(writer, 200, load_camera_map())
             return
@@ -687,6 +692,13 @@ class ApiServer:
         if self.vision is not None:
             self.vision.start()
             print("[api] CS_VISION_SEVILLE bridge starting", flush=True)
+        calls = os.environ.get("CS_SIGNALWIRE_ENABLED", "").strip().lower() in {
+            "1",
+            "true",
+            "yes",
+            "on",
+        }
+        print(f"[api] vision={self.vision is not None} calls={calls}", flush=True)
         # Health, usage and activity run from startup, viewer or not.
         await self.hub.seed()
         await self.hub.start_loops()

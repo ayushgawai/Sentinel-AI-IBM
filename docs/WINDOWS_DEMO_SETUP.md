@@ -1,6 +1,6 @@
 # Windows demo setup
 
-IBM Sentinel AI is an independent staged demonstration. It is not an official IBM product, and it does not use IBM Cloud, Granite, or watsonx.
+Sentinel is an independent staged demonstration. It is not an official product. A configured weapon incident can call watsonx for a Granite Guardian check; BeeAI then decides dispatch.
 
 The runtime shows three synchronized playback cameras. Integrations are disabled unless you explicitly configure them. This document does not deploy anything.
 
@@ -75,7 +75,7 @@ The wall plays CAM-01, CAM-02, and CAM-03 from `/media/cam-01`, `/media/cam-02`,
 
 Handoffs are at 60.0, 117.0, 216.6, 230.2, and 267.8 seconds. The clip ends at 339.8 seconds.
 
-Weapon boxes on the recording come from `data/feeds/seville_weapon_timeline.json`. Scene-script answers come from `data/feeds/seville_scene_script.json`. Both are precomputed. YOLO tracks people on the playback when the vision process is running. Qwen is a local VLM and runs only if that runtime is configured and up. Nothing here calls watsonx.
+Weapon boxes on the recording come from `data/feeds/seville_weapon_timeline.json`. Scene-script answers come from `data/feeds/seville_scene_script.json`. Both are precomputed. YOLO tracks people on the playback when the vision process is running. Qwen is a local VLM and runs only if that runtime is configured and up. A weapon incident calls Granite Guardian on watsonx when those settings are present, then BeeAI decides whether dispatch may continue.
 
 ## Validation
 

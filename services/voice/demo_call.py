@@ -1,57 +1,89 @@
-"""Scripted 911 call for demo recordings, keyed to the clip clock.
+"""On-screen 911 conversation for demo recordings. No phone is dialed.
 
-Every line is spoken at its clip second (the wall's video time), so what
-Sentinel says matches the picture: counts, weapons and people were checked
-against the labelled frames (data/feeds/seville_scene_script.json). The
-voice-over is added in editing; this drives the on-screen transcript.
+Each line is held for the time it takes to say it at about 150 words per
+minute. A change of speaker adds one second of silence before the next line.
 """
 
 from __future__ import annotations
 
-# (clip second, speaker, text)
-DEMO_CALL: list[tuple[float, str, str]] = [
-    (6, "dispatcher", "Simulated dispatcher. What is the address of this staged demonstration?"),
-    (9, "sentinel", "This is a staged demonstration, not emergency services. IBM Sentinel AI is reporting armed people in the ground-floor lobby of IBM Demo Building A, 1 New Orchard Road in Armonk."),
-    (16, "dispatcher", "Okay. Who am I speaking with? Where are you calling from?"),
-    (19, "sentinel", "This is Sentinel AI, the IBM-focused campus security demo system. I'm calling from the Building A camera network."),
-    (26, "dispatcher", "How many people do you see?"),
-    (28, "sentinel", "Eight people in the lobby. Five of them are armed."),
-    (34, "dispatcher", "What weapons do they have?"),
-    (37, "sentinel", "Handguns and a knife. I count five handguns and one knife."),
-    (44, "dispatcher", "Describe the people with weapons."),
-    (47, "sentinel", "A man in a red polo shirt and jeans with a handgun. Two men in black T-shirts with handguns. A man in a white shirt with a handgun, and a man in a light-blue shirt with a knife."),
-    (55, "dispatcher", "Is anyone hurt? Is anyone down?"),
-    (57, "sentinel", "No one appears injured, and no one is down on camera. A man near the doors is now carrying a rifle."),
-    (62, "sentinel", "Update: two of them just left the lobby and entered the east corridor on the ground floor, heading west."),
-    (68, "dispatcher", "Describe the two in the corridor."),
-    (71, "sentinel", "The closest is a man in a dark polo shirt and jeans with a handgun in his left hand. Ahead of him, a man in a white shirt with a knife."),
-    (80, "dispatcher", "Which way are they going?"),
-    (82, "sentinel", "West, down the east corridor, away from the lobby and toward the west wing and the stairwell."),
-    (94, "dispatcher", "Any other weapons?"),
-    (96, "sentinel", "Yes. Another man is carrying a rifle down by his side."),
-    (106, "dispatcher", "Describe him."),
-    (108, "sentinel", "A man in a black T-shirt and khaki trousers, rifle in his right hand, walking away from the camera."),
-    (119, "sentinel", "Update: they've left the east corridor and entered the west corridor, near the stairwell."),
-    (127, "dispatcher", "Are they going upstairs?"),
-    (129, "sentinel", "No, they're staying on the ground floor. A man in a black T-shirt and jeans has a handgun, and the man ahead of him also has a handgun."),
-    (145, "dispatcher", "Anything new?"),
-    (148, "sentinel", "A man in a white T-shirt and blue shorts is carrying a rifle further down the west corridor."),
-    (160, "dispatcher", "Officers are entering the building now. Where are they?"),
-    (162, "sentinel", "Still in the west corridor near the stairwell, on the ground floor, walking away from the camera."),
-    (173, "sentinel", "The west corridor camera is clear right now. They've stepped out of view near the stairwell."),
-    (196, "sentinel", "They're back in view: a man in a black T-shirt and shorts with a handgun, and a man in a light-blue shirt holding a knife."),
-    (206, "dispatcher", "Which way now?"),
-    (208, "sentinel", "Back toward the east corridor. They're heading for the lobby."),
-    (232, "sentinel", "Update: they've moved from the west corridor back into the east corridor, heading toward the lobby."),
-    (244, "sentinel", "A man in a black T-shirt is holding up a handgun in the east corridor."),
-    (252, "dispatcher", "Units are staging at the main entrance. How many are coming?"),
-    (254, "sentinel", "Two people on this camera, one of them carrying a rifle."),
-    (270, "sentinel", "Update: they're back in the ground-floor lobby, moving toward the main entrance."),
-    (293, "dispatcher", "How many are in the lobby now?"),
-    (295, "sentinel", "Three people with three handguns and a knife, and more are coming in through the doors."),
-    (318, "dispatcher", "Describe the ones near the exit."),
-    (320, "sentinel", "A man in a white T-shirt and blue denim shorts carrying a rifle, and a man in a black T-shirt with a handgun."),
-    (330, "dispatcher", "Units are at the doors. Stay on the line."),
-    (332, "sentinel", "Understood. I'll stay on the line and report every camera change."),
+WPM = 150
+BEAT_S = 1.0
+PLACE = "Spartan Complex"
+
+# (speaker, text). Timestamps are derived; do not hand-tune them.
+_LINES: list[tuple[str, str]] = [
+    ("dispatcher", "911, what's your emergency?"),
+    ("sentinel", f"Hi, this is Sentinel AI. I'm reporting armed people inside {PLACE}."),
+    ("sentinel", f"The address is {PLACE}."),
+    ("dispatcher", "Where are you calling from?"),
+    ("sentinel", f"This is Sentinel AI, on the camera network at {PLACE}."),
+    ("sentinel", "Armed people are in the ground-floor lobby."),
+    ("sentinel", "I see handguns and a knife in the ground-floor lobby."),
+    ("dispatcher", "Okay, how many people do you see?"),
+    ("sentinel", "Give me a moment."),
+    ("sentinel", "Eight people in the ground-floor lobby."),
+    ("sentinel", "Six of them are armed."),
+    (
+        "sentinel",
+        "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor.",
+    ),
+    ("dispatcher", "Stay on the line."),
+    ("sentinel", "Understood. I'll stay on the line and report every camera change."),
 ]
-OPENING = 2  # lines always spoken first, even if the call starts late
+
+
+def speak_s(text: str) -> float:
+    """Seconds to speak `text` at WPM. One word is the minimum."""
+    words = [w for w in text.split() if w]
+    return max(1, len(words)) * 60.0 / WPM
+
+
+def paced(lines: list[tuple[str, str]]) -> list[tuple[float, str, str]]:
+    """Absolute start time for each line. The next line starts only after this one is spoken."""
+    t = 0.0
+    out: list[tuple[float, str, str]] = []
+    prev = ""
+    for speaker, text in lines:
+        if prev and speaker != prev:
+            t += BEAT_S
+        out.append((round(t, 3), speaker, text))
+        t += speak_s(text)
+        prev = speaker
+    return out
+
+
+DEMO_CALL: list[tuple[float, str, str]] = paced(_LINES)
+DURATION = round(DEMO_CALL[-1][0] + speak_s(DEMO_CALL[-1][2]), 3)
+
+
+def line_waits() -> list[tuple[float, str, str]]:
+    """Seconds the player waits after the previous line before showing this one."""
+    waits: list[tuple[float, str, str]] = []
+    prev_t = 0.0
+    for i, (at_s, speaker, text) in enumerate(DEMO_CALL):
+        waits.append((0.0 if i == 0 else round(at_s - prev_t, 3), speaker, text))
+        prev_t = at_s
+    return waits
+
+
+def _check() -> None:
+    banned = ("simulat", "psap", "deterministic", "never emergency", "never-emergency", "ibm")
+    assert DEMO_CALL[0][0] == 0.0
+    assert DEMO_CALL[-1][0] < DURATION
+    blob = " ".join(text for _, _, text in DEMO_CALL).lower()
+    assert PLACE.lower() in blob
+    assert not any(word in blob for word in banned)
+    prev_t, prev_speaker, prev_text = DEMO_CALL[0]
+    for at_s, speaker, text in DEMO_CALL[1:]:
+        gap = at_s - prev_t
+        need = speak_s(prev_text) + (BEAT_S if speaker != prev_speaker else 0.0)
+        assert gap + 1e-6 >= need, (gap, need, prev_text)
+        assert at_s > prev_t
+        prev_t, prev_speaker, prev_text = at_s, speaker, text
+
+
+if __name__ == "__main__":
+    _check()
+    for wait, speaker, text in line_waits():
+        print(f"{wait:5.2f}s  {speaker:10}  {text}")
+    print(f"demo call {DURATION:.1f}s OK")

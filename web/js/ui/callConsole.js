@@ -10,7 +10,7 @@ import { cameraLabel, classLabel, formatClock, severityLabel, stateLabel } from 
 import { cameraTitle } from "../site.js?v=pro9";
 import { icon } from "../icons.js?v=pro9";
 import { pathHops } from "../tracking.js?v=pro9";
-import { subscribeModelStatus } from "../modelStatus.js?v=pro9";
+import { subscribeModelStatus } from "../modelStatus.js?v=pro11";
 import { OP_STATUS_EVENT } from "./operator.js?v=pro9";
 import { incidentActions } from "./incidentActions.js?v=pro9";
 import { renderConversation, stickToBottom, toolLine } from "./conversation.js?v=pro9";
@@ -31,14 +31,14 @@ function skeleton(host) {
     <div class="cc">
       <header class="card cc-head">
         <div class="cc-head__l">
-          <h2 class="cc-title">Emergency Call</h2>
+          <h2 class="cc-title">911 Call</h2>
           <p class="cc-desc" data-desc>No active call</p>
           <span class="ochip ochip--state cc-label" data-label hidden></span>
         </div>
         <div class="cc-head__r">
           <span class="ochip cc-status" data-status hidden><span class="cc-status__dot" aria-hidden="true"></span><span data-status-t></span></span>
           <span class="cc-timer mono" data-timer>00:00</span>
-          <span class="cc-live mono" data-live hidden><span class="cc-live__dot" aria-hidden="true"></span>SIM</span>
+          <span class="cc-live mono" data-live hidden><span class="cc-live__dot" aria-hidden="true"></span>LIVE</span>
         </div>
       </header>
       <div class="cc-grid">
@@ -161,7 +161,7 @@ function paintStatus(v, statusKey) {
   v.status.hidden = !statusKey;
   if (!statusKey) return;
   v.status.className = `ochip cc-status cc-status--${statusKey}`;
-  setText(v.statusT, statusKey === "live" ? "Simulated" : "Ended");
+  setText(v.statusT, statusKey === "live" ? "LIVE" : "Ended");
 }
 
 /** Active call console (Call page, "Active call" tab). */
@@ -266,7 +266,7 @@ export function renderSavedCall(host, rec) {
   const startMs = Date.parse(rec.startedAt || "");
   paintDesc(v.desc, rec.description || `${classLabel(rec.classToken)} call · ${rec.camera}`, startMs);
   v.label.hidden = false;
-  setText(v.label, /not connected/i.test(rec.label || "") ? "Call not connected" : "Simulated dispatch. No responder is connected.");
+  setText(v.label, /not connected/i.test(rec.label || "") ? "Call not connected" : "Connected");
   paintStatus(v, "ended");
   setText(v.timer, formatCallTimer(rec.durationMs || 0));
   renderConversation(v.scroll, {

@@ -23,7 +23,7 @@ import { redactPlaces, cameraTitle } from "../site.js?v=pro9";
 import { clear, el, setText } from "../dom.js?v=pro9";
 import { OP_STATUS_EVENT, operatorActions, actionBar } from "./operator.js?v=pro9";
 import { isDispatchedOrLater } from "../actions.js?v=pro9";
-import { subscribeModelStatus } from "../modelStatus.js?v=pro9";
+import { subscribeModelStatus } from "../modelStatus.js?v=pro11";
 import { renderConversation } from "./conversation.js?v=pro9";
 
 const STREAM_MERGE_MS = 700;
@@ -105,16 +105,22 @@ export function findCallIncident(state) {
  * Call provider label: the active call's DISPATCHED note says whether the api
  * placed a SignalWire call; with no call, /voice/status says what it would do.
  */
+export const CALL_TITLE = "911 Call";
+
+/** Status line on the call card. Empty when there is no call. */
 export function callNoteText(state) {
   const inc = findCallIncident(state);
-  if (inc && state.call?.providerError) {
-    return "SignalWire call failed; demo stayed on a simulated line.";
-  }
-  const provider = state.call?.provider;
-  if (provider === "signalwire") {
-    return "SignalWire demo line to a configured test number (never emergency services).";
-  }
-  return "Deterministic simulated dispatch line (never emergency services).";
+  if (!inc) return "";
+  if (state.call?.providerError) return "Call not connected";
+  if (ENDED_CALL_STATES.has(inc.state)) return "Ended";
+  return "Connected";
+}
+
+function paintCallNote(noteEl, state) {
+  if (!noteEl) return;
+  const text = callNoteText(state);
+  noteEl.hidden = !text;
+  setText(noteEl, text);
 }
 
 /**
@@ -199,14 +205,14 @@ export function mountCallHost(host, store, actions) {
     <div class="call-console">
       <header class="card call-head-card lc-headcard" data-head>
         <div class="lc-head">
-          <h2 class="lc-title" data-class>Emergency Call</h2>
+          <h2 class="lc-title" data-class>911 Call</h2>
           <div class="lc-timer" data-timerbox hidden>
             <span class="lc-timer__t mono" data-timer>00:00</span>
-            <span class="lc-timer__live mono" data-live><span class="lc-timer__dot" aria-hidden="true"></span>SIM</span>
+            <span class="lc-timer__live mono" data-live><span class="lc-timer__dot" aria-hidden="true"></span>LIVE</span>
           </div>
         </div>
         <p class="lc-meta" data-meta>No active call</p>
-        <p class="ochip ochip--state lc-sim">Simulated dispatch. No responder is connected.</p>
+        <p class="ochip ochip--state lc-sim" data-note hidden></p>
         <div class="call-head-card__action" data-action hidden></div>
       </header>
 
@@ -226,7 +232,7 @@ export function mountCallHost(host, store, actions) {
   const chatScroll = host.querySelector("[data-chat]");
   const toolsHost = host.querySelector("[data-tools]");
   const actionEl = host.querySelector("[data-action]");
-  const noteEl = host.querySelector(".lc-sim");
+  const noteEl = host.querySelector("[data-note]");
   const timerBox = host.querySelector("[data-timerbox]");
   const liveEl = host.querySelector("[data-live]");
   let metaSig = null;
@@ -364,12 +370,12 @@ export function mountCallHost(host, store, actions) {
 
   function render(state) {
     const inc = findCallIncident(state);
-    setText(noteEl, callNoteText(state));
+    paintCallNote(noteEl, state);
     paintTimes(state);
     const cand = inc ? null : callCandidate(state);
     paintAction(cand);
     if (!inc) {
-      setText(classEl, "Emergency Call");
+      setText(classEl, "911 Call");
       // -2 = "no call" empty state, distinct from a call with no lines yet.
       if (lastThreadLen !== -2) {
         renderChat([]);
@@ -382,7 +388,7 @@ export function mountCallHost(host, store, actions) {
       return;
     }
 
-    setText(classEl, "Emergency Call");
+    setText(classEl, "911 Call");
 
     const all = (state.call?.transcript || []).filter(
       (t) => !state.call.incidentId || t.incident_id === inc.incident_id,
@@ -481,14 +487,14 @@ export function mountLiveCall(host, store, actions) {
   host.innerHTML = `
     <section class="card lc" aria-label="Call">
       <header class="lc-head">
-        <h2 class="lc-title" data-title>Emergency Call</h2>
+        <h2 class="lc-title" data-title>911 Call</h2>
         <div class="lc-timer" data-timerbox hidden>
           <span class="lc-timer__t mono" data-timer>00:00</span>
-          <span class="lc-timer__live mono" data-live><span class="lc-timer__dot" aria-hidden="true"></span>SIM</span>
+          <span class="lc-timer__live mono" data-live><span class="lc-timer__dot" aria-hidden="true"></span>LIVE</span>
         </div>
       </header>
       <p class="lc-meta" data-meta>No active call</p>
-      <p class="ochip ochip--state lc-sim" data-note>Simulated dispatch. No responder is connected.</p>
+      <p class="ochip ochip--state lc-sim" data-note hidden></p>
       <div class="lc-thread" data-thread role="log" aria-live="polite" aria-label="Call transcript"></div>
       <div class="lc-actions is-empty" data-action></div>
     </section>
@@ -566,16 +572,17 @@ export function mountLiveCall(host, store, actions) {
       live: Boolean(inc) && !ENDED_CALL_STATES.has(inc.state),
       nowMs: now(),
       empty: inc ? "Connecting the call." : "Calls appear here when help is dispatched.",
+      subtitleLines: 5,
     });
   }
 
   function render(state) {
     const inc = findCallIncident(state);
-    setText(noteEl, callNoteText(state));
+    paintCallNote(noteEl, state);
     paintTimes(state);
     const cand = inc ? null : callCandidate(state);
     paintAction(cand);
-    setText(titleEl, "Emergency Call");
+    setText(titleEl, "911 Call");
     const all = inc
       ? (state.call?.transcript || []).filter((t) => !state.call.incidentId || t.incident_id === inc.incident_id)
       : [];
@@ -633,7 +640,7 @@ export function mountCallPanel(root, store, actions) {
     <div class="sidebar callpanel">
       <header class="sidebar__head">
         <span class="callpanel__label">Call</span>
-        <span class="call-sim-note">Simulated dispatch. No responder is connected.</span>
+        <span class="call-sim-note" hidden></span>
         <button type="button" class="btn btn--ghost" data-close aria-label="Close call panel">Close</button>
       </header>
       <div class="sidebar__body">
@@ -797,7 +804,7 @@ export function mountCallPanel(root, store, actions) {
   function render(state) {
     if (!open) return;
     const inc = findCallIncident(state);
-    setText(noteEl, callNoteText(state));
+    paintCallNote(noteEl, state);
     paintTimes(state);
     paintFooter(inc);
 
@@ -819,7 +826,7 @@ export function mountCallPanel(root, store, actions) {
     }
 
     const ended = ENDED_CALL_STATES.has(inc.state);
-    setText(classEl, "Emergency Call");
+    setText(classEl, "911 Call");
     headCamEl.hidden = false;
     setText(headCamEl, cameraTitle(inc.camera_id));
 

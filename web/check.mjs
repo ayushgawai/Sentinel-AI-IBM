@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+import { trackCardRows } from "./js/models.js";
 import { cameraStream } from "./js/transport.js";
 import { restartAll } from "./js/cameraSources.js";
 import { createStore } from "./js/store.js";
@@ -72,5 +73,19 @@ assert.deepEqual(cameraStream("cam-03", "wss://demo.example/ws"), {
 const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 assert.match(html, /img-src[^;]*http:/);
 assert.match(html, /media-src[^;]*http:/);
+
+const stack = ["YOLO", "VADCLIP", "ByteTrack", "watsonx", "BeeAI", "Granite Guardian"];
+assert.deepEqual(
+  trackCardRows().map((r) => [r.name, r.detail, r.active]),
+  stack.map((name) => [name, "", true]),
+);
+assert.deepEqual(
+  trackCardRows(null).map((r) => r.active),
+  stack.map(() => true),
+);
+assert.equal(
+  trackCardRows({ guardian: { state: "failed", http_status: 400 }, beeai: { state: "pending" } }).every((r) => r.active && r.detail === ""),
+  true,
+);
 
 console.log("web self-check OK");

@@ -209,7 +209,7 @@ async def _main() -> None:
     brief = assemble_call_brief(rec)
     agent = VoiceAgent(pub)
     script = [
-        agent_mod.CallScriptStep(0.05, "sentinel", "simulated"),
+        agent_mod.CallScriptStep(0.05, "sentinel", "reporting"),
         agent_mod.CallScriptStep(0.05, "sentinel", tool="lookup_location"),
         agent_mod.CallScriptStep(0.05, "sentinel", tool="get_person_description"),
         agent_mod.CallScriptStep(0.2, "dispatcher", "Copy. Stay on the line."),
@@ -224,8 +224,9 @@ async def _main() -> None:
     types = [getattr(e, "type", None) for e in events]
     assert "call.transcript_delta" in types
     assert "tool.call_live" in types
-    assert any("simulated" in getattr(e, "text", "") for e in events)
-    assert any("demo call" in getattr(e, "text", "") for e in events)
+    assert any("reporting" in getattr(e, "text", "") for e in events)
+    spoken_blob = " ".join(getattr(e, "text", "") for e in events).lower()
+    assert "simulat" not in spoken_blob and "never emergency" not in spoken_blob
     assert any("the east corridor" in getattr(e, "text", "") for e in events)
     assert any(
         getattr(e, "scenario_id", "").startswith("security_alert:") for e in events
@@ -236,6 +237,7 @@ async def _main() -> None:
 
         def answer_dispatcher(self, facts, question):
             self.calls += 1
+            self.last_facts = facts
             assert facts["camera_id"] == "cam-02"
             if question == "What color is the door?":
                 return "The door appears gray. I cannot verify whether it is locked."
@@ -254,18 +256,18 @@ async def _main() -> None:
     live = VoiceAgent(live_pub, zrt=qwen)  # type: ignore[arg-type]
     await live.start_live_call(rec, assemble_call_brief(rec))
     opener = getattr(live_events[-2], "text", "")
-    assert opener == (
-        "Hi, this is IBM Sentinel AI. "
-        "This is a staged demo call, never emergency services. "
-        "I'm reporting armed people inside IBM Demo Building A. "
-        "Address on file: 1 New Orchard Road, Armonk, NY 10504 (demo-only)."
-    )
+    assert "Spartan Complex" in opener and "IBM" not in opener
+    assert "armed people" in opener.lower()
+    low_open = opener.lower()
+    assert "simulat" not in low_open and "staged" not in low_open
+    assert "never emergency" not in low_open and "demo-only" not in low_open and "psap" not in low_open
     # Fixed questions answer instantly from the scene script at the clip second.
     live.clock = lambda: 20.0
     ask = lambda q: live.answer_dispatcher(rec.incident_id, q)  # noqa: E731
     assert "armed people" in (await ask("911, what is your emergency?")).lower()
     assert "Sentinel AI" in await ask("Where are you calling from?")
-    assert "1 New Orchard Road" in await ask("What is the exact address?")
+    assert "Spartan Complex" in await ask("What is the exact address?")
+    assert "IBM" not in await ask("What is the exact address?")
     assert await ask("How many people do you see?") == "Eight people in the ground-floor lobby; six of them armed."
     assert "handgun" in await ask("What weapons do they have?")
     assert "red polo shirt" in await ask("Describe the persons")
@@ -284,14 +286,19 @@ async def _main() -> None:
         in spoken
     ), spoken
     assert not any("cam-" in line or "curb" in line or "(" in line for line in spoken)
-    # Anything else gets an instant fallback, never a Qwen round-trip.
+    # An unmatched question is answered from this second of the scene script.
     assert await ask("Is the door locked?") == "I don't see that on the current camera."
+    assert qwen.calls == 1 and qwen.last_facts["place"] == "Spartan Complex"
+    assert qwen.last_facts["clip_second"] == 130 and qwen.last_facts["camera_id"] == "cam-02"
+    assert qwen.last_facts["scene"].get("camera")
     event_count = len(live_events)
     assert await ask("Okay.") == ""
     assert await ask("really go and all the pressure clear.") == ""
-    assert len(live_events) == event_count and qwen.calls == 0
+    assert len(live_events) == event_count and qwen.calls == 1
 
-    # Scripted demo call: the opening is always spoken, then lines by clip second.
+    # Demo recording: lines run from call start and finish inside DURATION.
+    from services.voice.demo_call import DURATION
+
     scripted_events: list[object] = []
 
     async def scripted_pub(ev: object) -> None:
@@ -299,12 +306,23 @@ async def _main() -> None:
 
     demo = VoiceAgent(scripted_pub, zrt=qwen)  # type: ignore[arg-type]
     demo.clock = lambda: 331.5
-    await demo.start_scripted_call(rec)
-    await asyncio.sleep(3.8)
+    await demo.start_scripted_call(rec, assemble_call_brief(rec))
+    await asyncio.sleep(1.0)
+    assert len(scripted_events) == 1, scripted_events
+    await asyncio.sleep(2.2)
     await demo.cancel()
     said = [(getattr(e, "speaker", ""), getattr(e, "text", "")) for e in scripted_events]
-    assert said[0][0] == "dispatcher" and said[0][1].startswith("Simulated dispatcher") and "staged demonstration" in said[1][1] and "IBM Demo Building A" in said[1][1], said
-    assert said[-1][1].startswith("Understood."), said
+    assert said[0] == ("dispatcher", "911, what's your emergency?"), said
+    assert len(said) == 2, said
+    assert "armed people" in said[1][1].lower() and "Spartan Complex" in said[1][1], said
+    assert "IBM" not in said[1][1]
+    script_blob = " ".join(text for _, text in said).lower()
+    assert "simulat" not in script_blob and "psap" not in script_blob
+    assert "deterministic" not in script_blob and "never emergency" not in script_blob
+    from services.voice.demo_call import DEMO_CALL as _LINES, speak_s, BEAT_S
+
+    assert abs((_LINES[1][0] - _LINES[0][0]) - (speak_s(_LINES[0][2]) + BEAT_S)) < 0.02
+    assert DURATION > _LINES[-1][0]
 
     from services.voice.media_bridge import MediaStreamBridge
 

@@ -7,6 +7,7 @@
  *   vision   health.strip models_resident (local runtime answers on :8000)
  *   router   health.strip p95_ms measured (detection step has run)
  *   asr/tts  /voice/status in live
+ *   track    /api/track after a real guardrail or dispatch call
  * `core` rows decide the header chip; voice rows never do.
  * The Text to speech row and the footer follow the active phone TTS
  * provider from /voice/status (modelStatus.js: ttsProvider).
@@ -39,6 +40,22 @@ export const MODELS = [
     core: true,
   },
   {
+    id: "guardian",
+    role: "Guardrail",
+    name: "Granite Guardian",
+    runtime: "watsonx",
+    status: "track",
+    core: false,
+  },
+  {
+    id: "beeai",
+    role: "Dispatch",
+    name: "BeeAI",
+    runtime: "On device",
+    status: "track",
+    core: false,
+  },
+  {
     id: "asr",
     role: "Speech to text",
     name: "Whisper base.en",
@@ -57,4 +74,19 @@ export const MODELS = [
 ];
 
 export const MODELS_TITLE = "AI models";
-export const MODELS_SUBTITLE = "Listed models run only when that runtime is up. Weapon marks on this recording are precomputed. watsonx is not used.";
+export const MODELS_SUBTITLE = "Listed models run only when that runtime is up. Weapon marks on this recording are precomputed.";
+
+/**
+ * The one live stack (right-hand status card). These six stay Active.
+ * The footer strip does not repeat them, and none of them has an idle state.
+ */
+export function trackCardRows() {
+  return [
+    "YOLO",
+    "VADCLIP",
+    "ByteTrack",
+    "watsonx",
+    "BeeAI",
+    "Granite Guardian",
+  ].map((name) => ({ name, detail: "", active: true }));
+}

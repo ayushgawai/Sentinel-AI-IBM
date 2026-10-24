@@ -5,7 +5,7 @@
  * voice probe just leaves those rows Pending; nothing is shown as an error.
  */
 
-import { MODELS } from "./models.js?v=pro9";
+import { MODELS } from "./models.js?v=pro11";
 
 const VOICE_POLL_MS = 5000;
 const VOICE_TIMEOUT_MS = 5000;
@@ -17,6 +17,8 @@ export const STATUS_DOT = { ready: "dot--ok", warming: "dot--warn", pending: "do
 
 /** null until the first /voice/status answer. */
 let voice = null;
+/** null until the first /api/track answer. guardian/beeai stay pending until a real call. */
+let track = null;
 const listeners = new Set();
 
 function voiceStatusUrl() {
@@ -29,6 +31,36 @@ function voiceStatusUrl() {
   } catch {
     return null;
   }
+}
+
+function trackStatusUrl() {
+  const voiceUrl = voiceStatusUrl();
+  if (!voiceUrl) return null;
+  return new URL("/api/track", voiceUrl).toString();
+}
+
+async function probeTrack(url) {
+  const ctl = new AbortController();
+  const timer = window.setTimeout(() => ctl.abort(), VOICE_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { cache: "no-store", signal: ctl.signal });
+    if (!res.ok) return;
+    const body = await res.json();
+    if (!body || typeof body !== "object" || !body.guardian || !body.beeai) return;
+    const next = { guardian: body.guardian, beeai: body.beeai };
+    if (track && JSON.stringify(track) === JSON.stringify(next)) return;
+    track = next;
+    for (const fn of listeners) fn();
+  } catch {
+    // Keep the last real answer. A missed poll is not a failed model call.
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
+/** Latest /api/track body, or null before the first answer. */
+export function trackReadiness() {
+  return track;
 }
 
 async function probeVoice(url) {
@@ -91,10 +123,20 @@ export function startModelStatus(store) {
     const conn = state.connection?.status ?? null;
     if (conn === lastConn) return;
     lastConn = conn;
-    if (conn === "LIVE") probeVoice(url);
+    if (conn === "LIVE") {
+      probeVoice(url);
+      const trackUrl = trackStatusUrl();
+      if (trackUrl && cspAllows(trackUrl)) probeTrack(trackUrl);
+    }
   });
-  const timer = window.setInterval(() => probeVoice(url), VOICE_POLL_MS);
+  const timer = window.setInterval(() => {
+    probeVoice(url);
+    const trackUrl = trackStatusUrl();
+    if (trackUrl && cspAllows(trackUrl)) probeTrack(trackUrl);
+  }, VOICE_POLL_MS);
   probeVoice(url);
+  const trackUrl = trackStatusUrl();
+  if (trackUrl && cspAllows(trackUrl)) probeTrack(trackUrl);
   return () => {
     unsub();
     window.clearInterval(timer);
@@ -155,7 +197,11 @@ export function modelRows(state) {
   /** @returns {ModelStatus} */
   const provider = ttsProvider(state);
 
-  function statusOf(source) {
+  function statusOf(model) {
+    const source = model.status;
+    if (source === "track") {
+      return track?.[model.id]?.state === "active" ? "ready" : "pending";
+    }
     if (source === "tts" && provider === "elevenlabs") {
       return voice?.cloudTts ? "ready" : "pending";
     }
@@ -171,7 +217,7 @@ export function modelRows(state) {
   }
 
   const rows = MODELS.map((m) => {
-    const status = statusOf(m.status);
+    const status = statusOf(m);
     let metric = "";
     if (m.metric === "p95" && received && Number.isFinite(h.p95_ms)) {
       metric = `Step p95 ${Math.round(h.p95_ms)} ms`;

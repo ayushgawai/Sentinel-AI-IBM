@@ -314,16 +314,18 @@ async def _main() -> None:
     said = [(getattr(e, "speaker", ""), getattr(e, "text", "")) for e in scripted_events]
     assert said[0] == ("dispatcher", "911, what's your emergency?"), said
     assert len(said) == 2, said
-    assert "armed people" in said[1][1].lower() and "Spartan Complex" in said[1][1], said
-    assert "IBM" not in said[1][1]
+    assert said[1] == (
+        "sentinel",
+        "Hi, this is IBM Sentinel AI at IBM Demo Building A.",
+    ), said
     script_blob = " ".join(text for _, text in said).lower()
     assert "simulat" not in script_blob and "psap" not in script_blob
     assert "deterministic" not in script_blob and "never emergency" not in script_blob
     from services.voice.demo_call import DEMO_CALL as _LINES, speak_s, BEAT_S
 
     assert abs((_LINES[1][0] - _LINES[0][0]) - (speak_s(_LINES[0][2]) + BEAT_S)) < 0.02
-    # A scripted handoff is a paced exchange: one concise Sentinel update,
-    # then one responder acknowledgement after a natural pause.
+    # The reference-style scripted call reports movement as a concise,
+    # one-way Sentinel update. The dispatcher does not narrate the camera.
     scripted_events.clear()
     demo = VoiceAgent(scripted_pub, zrt=qwen)  # type: ignore[arg-type]
     await demo.start_scripted_call(rec, assemble_call_brief(rec))
@@ -332,17 +334,12 @@ async def _main() -> None:
     await asyncio.sleep(1.2)
     handoff_events = scripted_events[event_count:]
     handoff_lines = [getattr(event, "text", "") for event in handoff_events]
-    assert "They've moved into the east corridor." in handoff_lines, handoff_lines
-    assert "Copy. Keep monitoring the east corridor." not in handoff_lines
-    await asyncio.sleep(1.7)
+    assert "Update: They have moved into the east corridor." in handoff_lines, handoff_lines
+    await asyncio.sleep(2.6)
     handoff_events = scripted_events[event_count:]
     handoff_lines = [getattr(event, "text", "") for event in handoff_events]
-    acknowledgements = [
-        event for event in handoff_events
-        if getattr(event, "text", "") == "Copy. Keep monitoring the east corridor."
-    ]
-    assert len(acknowledgements) == 1, handoff_lines
-    assert getattr(acknowledgements[0], "speaker", "") == "dispatcher"
+    assert not any("monitoring" in line.lower() for line in handoff_lines), handoff_lines
+    assert not any("keep tracking" in line.lower() for line in handoff_lines), handoff_lines
     await demo.cancel()
     assert DURATION > _LINES[-1][0]
 

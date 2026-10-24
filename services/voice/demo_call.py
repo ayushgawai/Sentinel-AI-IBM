@@ -8,18 +8,16 @@ from __future__ import annotations
 
 WPM = 120
 BEAT_S = 1.8
-PLACE = "Spartan Complex"
-
 # (speaker, text). Timestamps are derived; do not hand-tune them.
 _LINES: list[tuple[str, str]] = [
     ("dispatcher", "911, what's your emergency?"),
-    ("sentinel", f"This is Sentinel AI, the camera system at {PLACE}. I see armed people in the ground-floor lobby."),
+    ("sentinel", "Hi, this is IBM Sentinel AI at IBM Demo Building A."),
+    ("sentinel", "I'm reporting armed people in the ground-floor lobby."),
+    ("sentinel", "One moment."),
+    ("sentinel", "I can see handguns, a knife, and a long firearm in the ground-floor lobby."),
     ("dispatcher", "Okay, how many people do you see?"),
+    ("sentinel", "Give me a moment."),
     ("sentinel", "Eight people are visible. Six appear armed."),
-    ("dispatcher", "What weapons can you see?"),
-    ("sentinel", "I can see handguns, a knife, and a long firearm."),
-    ("dispatcher", "Okay. Keep monitoring them and tell me if they move."),
-    ("sentinel", "Understood."),
 ]
 
 
@@ -58,11 +56,11 @@ def line_waits() -> list[tuple[float, str, str]]:
 
 
 def _check() -> None:
-    banned = ("simulat", "psap", "deterministic", "never emergency", "never-emergency", "ibm")
+    banned = ("simulat", "psap", "deterministic", "never emergency", "never-emergency")
     assert DEMO_CALL[0][0] == 0.0
     assert DEMO_CALL[-1][0] < DURATION
     blob = " ".join(text for _, _, text in DEMO_CALL).lower()
-    assert PLACE.lower() in blob
+    assert "ibm demo building a" in blob
     assert not any(word in blob for word in banned)
     prev_t, prev_speaker, prev_text = DEMO_CALL[0]
     for at_s, speaker, text in DEMO_CALL[1:]:

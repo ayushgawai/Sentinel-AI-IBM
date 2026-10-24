@@ -74,21 +74,8 @@ WEAPON_SCRIPT: list[CallScriptStep] = [
 
 
 def heard(text: str) -> str:
-    """Transcript and phone audio: the place name is Spartan Complex."""
+    """Keep transcript and phone audio free of demo-only annotations."""
     cleaned = re.sub(r"\s*\(demo-only\)", "", text or "", flags=re.I)
-    cleaned = re.sub(
-        r"\bIBM(?:\s+Campus)?(?:\s+Sentinel)?(?:\s+Demo)?(?:\s+Building\s+A)?\b",
-        "Spartan Complex",
-        cleaned,
-        flags=re.I,
-    )
-    cleaned = re.sub(
-        r"1 New Orchard Road(?:,\s*Armonk,\s*New York)?",
-        "Spartan Complex",
-        cleaned,
-        flags=re.I,
-    )
-    cleaned = re.sub(r"(Spartan Complex)(?:,\s*\1)+", r"\1", cleaned)
     return re.sub(r"\s{2,}", " ", cleaned).strip()
 
 
@@ -128,7 +115,6 @@ class VoiceAgent:
         self._live = False
         self._scripted = False
         self._incident_id: str | None = None
-        self._scripted_reply_tasks: set[asyncio.Task[None]] = set()
         self._camera = ""
         self._address = ""
         self._building = ""
@@ -211,40 +197,6 @@ class VoiceAgent:
         finally:
             self._scripted = False
             self._incident_id = None
-            for task in tuple(self._scripted_reply_tasks):
-                task.cancel()
-            self._scripted_reply_tasks.clear()
-
-    async def _publish_scripted_handoff_reply(
-        self, incident_id: str, camera_id: str
-    ) -> None:
-        """Answer a real camera handoff with a natural responder turn."""
-        await asyncio.sleep(2.5)
-        if not self._scripted or incident_id != self._incident_id:
-            return
-        area = {
-            "cam-01": "the lobby",
-            "cam-02": "the east corridor",
-            "cam-03": "the west corridor",
-        }.get(camera_id.lower(), "that area")
-        await self.publish(
-            CallTranscriptDelta(
-                incident_id=incident_id,
-                speaker="dispatcher",
-                text=f"Copy. Keep monitoring {area}.",
-                ts=utcnow(),
-            )
-        )
-
-    def _schedule_scripted_handoff_reply(
-        self, incident_id: str, camera_id: str
-    ) -> None:
-        task = asyncio.create_task(
-            self._publish_scripted_handoff_reply(incident_id, camera_id),
-            name=f"demo-call-reply-{incident_id}",
-        )
-        self._scripted_reply_tasks.add(task)
-        task.add_done_callback(self._scripted_reply_tasks.discard)
 
     async def start_live_call(self, rec: IncidentRecord, brief: CallBrief) -> None:
         if self.busy():
@@ -418,8 +370,6 @@ class VoiceAgent:
             await self._publish_update(camera_id, address)
         else:
             await self._update_q.put((camera_id, address))
-        if self._scripted and self._incident_id:
-            self._schedule_scripted_handoff_reply(self._incident_id, camera_id)
 
     async def cancel(self) -> None:
         self._live = False
@@ -443,10 +393,10 @@ class VoiceAgent:
         report = scene.update_line(previous.upper(), camera_id.upper())
         if self._scripted:
             report = {
-                "cam-01": "They've moved into the lobby.",
-                "cam-02": "They've moved into the east corridor.",
-                "cam-03": "They've moved into the west corridor.",
-            }.get(camera_id.lower(), "They've moved to another area.")
+                "cam-01": "Update: They have returned to the lobby.",
+                "cam-02": "Update: They have moved into the east corridor.",
+                "cam-03": "Update: They have moved into the west corridor.",
+            }.get(camera_id.lower(), "Update: They have moved to another area.")
         await self.publish(
             CallTranscriptDelta(
                 incident_id=self._incident_id or "",

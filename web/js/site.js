@@ -4,7 +4,7 @@
  */
 
 export const SITE = {
-  name: "IBM Sentinel AI",
+  name: "Sentinel",
   type: "Independent staged demonstration",
   address: "1 New Orchard Road, Armonk, NY 10504 (demo-only)",
   timezone: "America/Los_Angeles",
@@ -30,9 +30,9 @@ export const SITE = {
  * Fine tune with ?mapedit=1.
  */
 export const CAMERAS = [
-  { id: "cam-01", n: 1, name: "IBM Demo Building A · Ground-floor lobby", x: 468, y: 393, heading: 150, plan: { x: 220, y: 170, heading: 135 } },
-  { id: "cam-02", n: 2, name: "IBM Demo Building A · East corridor", x: 495, y: 368, heading: 245, plan: { x: 500, y: 150, heading: 180 } },
-  { id: "cam-03", n: 3, name: "IBM Demo Building A · West corridor", x: 420, y: 385, heading: 65, plan: { x: 780, y: 170, heading: 225 } },
+  { id: "cam-01", n: 1, name: "Demo Building A · Ground-floor lobby", x: 468, y: 393, heading: 150, plan: { x: 220, y: 170, heading: 135 } },
+  { id: "cam-02", n: 2, name: "Demo Building A · East corridor", x: 495, y: 368, heading: 245, plan: { x: 500, y: 150, heading: 180 } },
+  { id: "cam-03", n: 3, name: "Demo Building A · West corridor", x: 420, y: 385, heading: 65, plan: { x: 780, y: 170, heading: 225 } },
 ];
 
 /**
@@ -118,7 +118,7 @@ export function cameraLabel(cameraId) {
   return `Camera ${n}`;
 }
 
-/** The camera's place ("IBM Demo Building A · East corridor"), or "". */
+/** The camera's place ("Demo Building A · East corridor"), or "". */
 export function cameraPlace(cameraId) {
   return byId.get(String(cameraId ?? ""))?.name || "";
 }

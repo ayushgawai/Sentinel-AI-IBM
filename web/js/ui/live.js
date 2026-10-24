@@ -1,12 +1,13 @@
 /**
  * Live page shell. Two modes, set on #page-live[data-mode] by cameras.js
  * from layoutCtl.plan() (the one place the camera layout is applied):
- *   watch    — no main camera: the framed 3×2 camera grid, Report and
- *              Broadcast in the wall toolbar.
+ *   watch    — no main camera: CAM-01–03 in one centred row. Site plan
+ *              above the incident list on the left; the track card and the
+ *              call on the right. Report and Broadcast live in the incident column.
  *   incident — a hero camera (an incident, or a camera click): a full-width
- *              incident banner over three aligned columns — incidents left;
- *              hero, tracking bar and thumbnails centre; site plan and call
- *              right.
+ *              incident banner over the same three columns — site plan and
+ *              incidents left; hero, tracking bar and thumbnails centre;
+ *              track card and call right.
  * The site map is ONE instance; "Expand" moves it (and the same camera
  * tiles) into the expanded map view (liveExpand.js) and puts it back.
  */
@@ -28,6 +29,7 @@ import { mountMap } from "./map.js?v=pro9";
 import { mountTrackingCard } from "./sitePlanExtras.js?v=pro9";
 import { mountLiveCall } from "./call.js?v=pro9";
 import { mountIncidentPanel } from "./sidebar.js?v=pro9";
+import { trackCardRows } from "../models.js?v=pro15";
 import { createLiveExpand } from "./liveExpand.js?v=pro9";
 import { OP_BROADCAST_EVENT, OP_REPORT_EVENT, opButton } from "./operator.js?v=pro9";
 import {
@@ -49,6 +51,26 @@ const LEGEND = [
 /** Flash on move: 3 pulses of 0.8 s (CSS), then the class is removed. */
 const FLASH_MS = 2400;
 
+/** One stack. Every row reads Active; there is no idle state. */
+function mountTrackCard(host) {
+  const card = el("section", {
+    className: "card ls-model",
+    attrs: { "aria-label": "YOLO, VADCLIP, ByteTrack, watsonx, BeeAI, and Granite Guardian" },
+  });
+  const list = el("ul", { className: "ls-track" });
+  for (const row of trackCardRows()) {
+    const li = el("li", { className: "ls-track__row" });
+    const text = el("span", { className: "ls-track__text" });
+    text.appendChild(el("span", { className: "ls-track__name", text: row.name }));
+    li.appendChild(text);
+    li.appendChild(el("span", { className: "lp-pill lp-pill--aqua", text: "Active" }));
+    list.appendChild(li);
+  }
+  card.appendChild(list);
+  host.appendChild(card);
+  return () => {};
+}
+
 export function mountLive(page, store, actions, layoutCtl, wall) {
   if (!page) return () => {};
   if (!page.dataset.mode) page.dataset.mode = "watch";
@@ -67,11 +89,10 @@ export function mountLive(page, store, actions, layoutCtl, wall) {
     return inc && isOpenIncident(inc) ? inc.incident_id : null;
   }
 
-  // ---------- Left: incidents ----------
+  // ---------- Left: site plan, then incidents ----------
   const incidentsHost = el("div", { className: "live-incidents" });
-  leftHost.appendChild(incidentsHost);
   const incidentPanel = mountIncidentPanel(incidentsHost, store, actions, layoutCtl, {
-    isVisible: () => isLiveRoute() && isIncident(),
+    isVisible: () => isLiveRoute(),
     variant: "live",
     broadcastTarget,
   });
@@ -119,7 +140,7 @@ export function mountLive(page, store, actions, layoutCtl, wall) {
   }
   window.addEventListener("keydown", onKey);
 
-  // ---------- Right: site plan card ----------
+  // ---------- Left: site plan card (full column width) ----------
   const site = el("section", { className: "card ls-site", attrs: { "aria-label": "Site plan" } });
   const siteHead = el("header", { className: "ls-head" });
   siteHead.appendChild(el("h2", { className: "ls-title", text: "Site plan" }));
@@ -147,7 +168,9 @@ export function mountLive(page, store, actions, layoutCtl, wall) {
     legend.appendChild(li);
   }
   site.appendChild(legend);
-  rightHost.appendChild(site);
+  const unsubTrack = mountTrackCard(rightHost);
+  leftHost.appendChild(site);
+  leftHost.appendChild(incidentsHost);
 
   const unmountMap = mountMap(mapHost, store, actions, {
     showTip: false,
@@ -354,6 +377,7 @@ export function mountLive(page, store, actions, layoutCtl, wall) {
   return () => {
     unsub();
     unsubTick();
+    unsubTrack();
     expand.close();
     window.removeEventListener("keydown", onKey);
     document.removeEventListener(LIVE_MODE_EVENT, onMode);

@@ -50,7 +50,7 @@ function createInitialState() {
       transcript: [],
       tools: [],
       dispatchedAt: null,
-      /** "signalwire" | "simulated", from the DISPATCHED note. */
+      /** "signalwire" | "onscreen", from the DISPATCHED note. */
       provider: null,
       /** SignalWire place_call failure reason, if any. */
       providerError: null,
@@ -305,7 +305,7 @@ export function createStore() {
           state.call.dispatchedAt = event.ts || next.updated_at;
           state.call.provider = /^signalwire\b/i.test(event.note || "")
             ? "signalwire"
-            : "simulated";
+            : "onscreen";
           state.call.providerError = null;
         }
         resortOrder(state);

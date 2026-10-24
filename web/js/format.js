@@ -54,7 +54,7 @@ const STATE_LABELS = {
   DISMISSED: "Dismissed",
 };
 
-/** States where the SIMULATED call/dispatch affordance must stay visible. */
+/** States where the call status must stay visible. */
 const DISPATCH_SIM_STATES = new Set([
   "DISPATCH_PENDING",
   "DISPATCHED",

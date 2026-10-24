@@ -4,7 +4,7 @@
  * Live: now() = Date.now() + a smoothed offset learned from backend event
  * timestamps (outlier jumps over 5 minutes are ignored).
  * Mock: now() = a runtime epoch (set to wall time at mock start and on
- * every reset) plus the player's simulated seconds — so it tracks real
+ * every reset) plus the player's playback seconds — so it tracks real
  * time, keeps advancing after the script ends, freezes on pause and runs
  * fast under 2x/4x, exactly like the player itself.
  *
@@ -54,7 +54,7 @@ export function getMockEpoch() {
   return mockEpochMs;
 }
 
-/** Latest simulated-seconds value reported by the mock player's onTick. */
+/** Latest playback-seconds value reported by the mock player's onTick. */
 export function setMockT(seconds) {
   mockT = seconds;
 }
@@ -64,7 +64,7 @@ export function now() {
   return mode === "LIVE" ? Date.now() + serverOffsetMs : mockEpochMs + mockT * 1000;
 }
 
-/** Mock-only: convert simulated seconds to an ISO string on the runtime epoch. */
+/** Mock-only: convert playback seconds to an ISO string on the runtime epoch. */
 export function mockIso(seconds) {
   return new Date(mockEpochMs + Math.round(seconds * 1000)).toISOString();
 }

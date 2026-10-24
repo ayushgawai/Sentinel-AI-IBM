@@ -63,13 +63,18 @@ function avatar(self) {
  * Render into `root` (cleared). `lines`: buildThread() output
  * ({speaker, text, ts}); `tools`: [{tool, ts}].
  * @param {HTMLElement} root
- * @param {{ lines: object[], tools?: object[], compact?: boolean, live?: boolean, toolText?: (t: string) => string, nowMs?: number, empty?: string }} opts
+ * `subtitleLines` keeps that many recent utterances on screen together.
+ * @param {{ lines: object[], tools?: object[], compact?: boolean, live?: boolean, subtitleLines?: number, toolText?: (t: string) => string, nowMs?: number, empty?: string }} opts
  */
 export function renderConversation(root, opts) {
-  const { lines = [], tools = [], compact = false, live = false } = opts;
+  const { tools = [], compact = false, live = false } = opts;
+  const lines = opts.subtitleLines
+    ? (opts.lines || []).slice(-opts.subtitleLines)
+    : opts.lines || [];
   while (root.firstChild) root.removeChild(root.firstChild);
   root.classList.add("cv");
   root.classList.toggle("cv--compact", compact);
+  root.classList.toggle("cv-subtitles", Boolean(opts.subtitleLines));
 
   const items = [
     ...lines.map((u) => ({ at: Date.parse(u.ts || "") || 0, kind: "msg", u })),
@@ -110,7 +115,7 @@ export function renderConversation(root, opts) {
       group = { self, lastAt: it.at, col, el: g };
     }
     const bubble = el("div", {
-      className: "cv-bubble",
+      className: opts.subtitleLines ? "cv-bubble cv-sub" : "cv-bubble",
       text: maskNumbers(redactPlaces(it.u.text)),
       attrs: it.at ? { title: fullTime(it.at) } : {},
     });

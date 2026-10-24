@@ -11,7 +11,7 @@
 import { el } from "../dom.js?v=pro9";
 import { now } from "../clock.js?v=pro9";
 import { isDispatchedOrLater } from "../actions.js?v=pro9";
-import { OP_BROADCAST_EVENT, OP_CALL_EVENT, dispatchedText, opButton } from "./operator.js?v=pro9";
+import { OP_BROADCAST_EVENT, dispatchedText, opButton } from "./operator.js?v=pro9";
 
 function actionBtn({ text, iconName, cls, onClick, disabled, key }) {
   const b = opButton({
@@ -68,24 +68,11 @@ export function incidentActions(inc, actions, store) {
       onClick: () => actions.confirm(id),
     });
   // Row 1: the primary action, full width.
-  const row1 = el("div", { className: "lp-actions__row lp-actions__row--one" });
   if (dispatched) {
+    const row1 = el("div", { className: "lp-actions__row lp-actions__row--one" });
     row1.appendChild(confirm());
-  } else {
-    const pending = dispatchSt?.state === "pending";
-    row1.appendChild(
-      actionBtn({
-        text: pending ? "Calling…" : "Call for help",
-        iconName: "phone",
-        cls: "lp-act--primary",
-        key: "call",
-        disabled: pending,
-        onClick: () =>
-          document.dispatchEvent(new CustomEvent(OP_CALL_EVENT, { detail: { incidentId: id } })),
-      }),
-    );
+    box.appendChild(row1);
   }
-  box.appendChild(row1);
   // Row 2: Broadcast | Dismiss.
   const row2 = el("div", { className: "lp-actions__row" });
   row2.appendChild(

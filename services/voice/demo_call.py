@@ -12,22 +12,19 @@ from __future__ import annotations
 DURATION = 339.8
 DEMO_CALL: list[tuple[float, str, str]] = [
     (0.0, "dispatcher", "911, what's your emergency?"),
-    (3.5, "sentinel", "Hi, this is Sentinel AI. I'm reporting armed people in the ground-floor lobby."),
-    (11.0, "sentinel", "One moment."),
-    (14.5, "sentinel", "I can see handguns, a knife, and a long firearm in the ground-floor lobby."),
-    (22.5, "dispatcher", "Okay, how many people do you see?"),
-    (26.0, "sentinel", "Give me a moment."),
-    (30.0, "sentinel", "Eight people are visible. Six appear armed."),
-    (60.0, "sentinel", "Update: They have moved into the east corridor."),
-    (63.5, "dispatcher", "Copy. I have the east-corridor update."),
-    (117.0, "sentinel", "Update: They have moved into the west corridor."),
-    (120.5, "dispatcher", "Copy. I have the west-corridor update."),
-    (216.6, "sentinel", "Update: They are turning back toward the east corridor."),
-    (220.0, "dispatcher", "Copy. I have the change in direction."),
-    (230.2, "sentinel", "Update: They have moved back into the east corridor."),
-    (233.7, "dispatcher", "Copy. I have the east-corridor update."),
-    (267.8, "sentinel", "Update: They have returned to the lobby."),
-    (271.3, "dispatcher", "Copy. I have the lobby update."),
+    (3.5, "sentinel", "Hi, this is Sentinel AI at San Jose State."),
+    (8.5, "sentinel", "I'm reporting armed people inside MacQuarrie Hall, One Washington Square."),
+    (15.0, "sentinel", "One moment."),
+    (18.5, "sentinel", "Armed people inside MacQuarrie Hall at San Jose State University."),
+    (24.5, "sentinel", "I see four handguns and one knife in the ground-floor lobby."),
+    (32.0, "dispatcher", "Okay, how many people do you see?"),
+    (35.5, "sentinel", "Give me a moment."),
+    (39.5, "sentinel", "Seven of them appear armed."),
+    (60.0, "sentinel", "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor."),
+    (117.0, "sentinel", "Update: they have moved from the east corridor into the west corridor."),
+    (216.6, "sentinel", "Update: they are returning through the west corridor."),
+    (230.2, "sentinel", "Update: they have moved from the west corridor into the east corridor."),
+    (267.8, "sentinel", "Update: they have returned to the ground-floor lobby."),
 ]
 
 
@@ -49,10 +46,10 @@ def _check() -> None:
     assert all(next_at > at_s for (at_s, _, _), (next_at, _, _) in zip(DEMO_CALL, DEMO_CALL[1:]))
     blob = " ".join(text for _, _, text in DEMO_CALL).lower()
     assert not any(word in blob for word in banned)
-    assert (60.0, "sentinel", "Update: They have moved into the east corridor.") in DEMO_CALL
-    assert (117.0, "sentinel", "Update: They have moved into the west corridor.") in DEMO_CALL
-    assert (230.2, "sentinel", "Update: They have moved back into the east corridor.") in DEMO_CALL
-    assert (267.8, "sentinel", "Update: They have returned to the lobby.") in DEMO_CALL
+    assert (60.0, "sentinel", "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor.") in DEMO_CALL
+    assert (117.0, "sentinel", "Update: they have moved from the east corridor into the west corridor.") in DEMO_CALL
+    assert (230.2, "sentinel", "Update: they have moved from the west corridor into the east corridor.") in DEMO_CALL
+    assert (267.8, "sentinel", "Update: they have returned to the ground-floor lobby.") in DEMO_CALL
 
 
 if __name__ == "__main__":

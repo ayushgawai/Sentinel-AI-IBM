@@ -316,30 +316,37 @@ async def _main() -> None:
     assert len(said) == 2, said
     assert said[1] == (
         "sentinel",
-        "Hi, this is Sentinel AI. I'm reporting armed people in the ground-floor lobby.",
+        "Hi, this is Sentinel AI at San Jose State.",
     ), said
     script_blob = " ".join(text for _, text in said).lower()
     assert "simulat" not in script_blob and "psap" not in script_blob
     assert "deterministic" not in script_blob and "never emergency" not in script_blob
     from services.voice.demo_call import DEMO_CALL as _LINES
 
-    # The demo transcript is the source of truth: it is tied to the three
-    # camera feeds rather than generated from variable frame detections.
+    # Match the restrained, reference-video 911 exchange. The opening has
+    # one dispatcher question; camera handoffs are concise Sentinel updates.
     assert _LINES[1][0] == 3.5
     assert DURATION == 339.8
+    assert _LINES[:10] == [
+        (0.0, "dispatcher", "911, what's your emergency?"),
+        (3.5, "sentinel", "Hi, this is Sentinel AI at San Jose State."),
+        (8.5, "sentinel", "I'm reporting armed people inside MacQuarrie Hall, One Washington Square."),
+        (15.0, "sentinel", "One moment."),
+        (18.5, "sentinel", "Armed people inside MacQuarrie Hall at San Jose State University."),
+        (24.5, "sentinel", "I see four handguns and one knife in the ground-floor lobby."),
+        (32.0, "dispatcher", "Okay, how many people do you see?"),
+        (35.5, "sentinel", "Give me a moment."),
+        (39.5, "sentinel", "Seven of them appear armed."),
+        (60.0, "sentinel", "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor."),
+    ], _LINES
     expected_handoffs = {
-        (60.0, "sentinel", "Update: They have moved into the east corridor."),
-        (63.5, "dispatcher", "Copy. I have the east-corridor update."),
-        (117.0, "sentinel", "Update: They have moved into the west corridor."),
-        (120.5, "dispatcher", "Copy. I have the west-corridor update."),
-        (216.6, "sentinel", "Update: They are turning back toward the east corridor."),
-        (220.0, "dispatcher", "Copy. I have the change in direction."),
-        (230.2, "sentinel", "Update: They have moved back into the east corridor."),
-        (233.7, "dispatcher", "Copy. I have the east-corridor update."),
-        (267.8, "sentinel", "Update: They have returned to the lobby."),
-        (271.3, "dispatcher", "Copy. I have the lobby update."),
+        (117.0, "sentinel", "Update: they have moved from the east corridor into the west corridor."),
+        (216.6, "sentinel", "Update: they are returning through the west corridor."),
+        (230.2, "sentinel", "Update: they have moved from the west corridor into the east corridor."),
+        (267.8, "sentinel", "Update: they have returned to the ground-floor lobby."),
     }
     assert expected_handoffs.issubset(set(_LINES)), _LINES
+    assert not any(speaker == "dispatcher" and at_s > 32.0 for at_s, speaker, _ in _LINES), _LINES
     assert not any("ibm" in text.lower() for _, _, text in _LINES), _LINES
 
     # A real camera handoff only updates internal call context. It must not

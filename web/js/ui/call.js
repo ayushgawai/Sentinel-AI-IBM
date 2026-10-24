@@ -572,7 +572,6 @@ export function mountLiveCall(host, store, actions) {
       live: Boolean(inc) && !ENDED_CALL_STATES.has(inc.state),
       nowMs: now(),
       empty: inc ? "Connecting the call." : "Calls appear here when help is dispatched.",
-      subtitleLines: 5,
     });
   }
 

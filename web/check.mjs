@@ -74,6 +74,11 @@ const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 assert.match(html, /img-src[^;]*http:/);
 assert.match(html, /media-src[^;]*http:/);
 
+// The live call panel is a transcript, not a subtitle strip: a demo viewer
+// must be able to scroll back through every line from the current call.
+const liveCallSource = readFileSync(new URL("./js/ui/call.js", import.meta.url), "utf8");
+assert.doesNotMatch(liveCallSource, /subtitleLines:\s*5/);
+
 const stack = ["YOLO", "VADCLIP", "ByteTrack", "watsonx", "BeeAI", "Granite Guardian"];
 assert.deepEqual(
   trackCardRows().map((r) => [r.name, r.detail, r.active]),

@@ -18,7 +18,7 @@
 
 import { CLOUD_EQUIV } from "./config.js?v=pro9";
 import { now } from "./clock.js?v=pro9";
-import { subscribeModelStatus, ttsProvider } from "./modelStatus.js?v=pro9";
+import { subscribeModelStatus, ttsProvider } from "./modelStatus.js?v=pro11";
 
 export const BUCKET_MS = 5 * 60 * 1000;
 const KEEP_MS = 8 * 24 * 60 * 60 * 1000;

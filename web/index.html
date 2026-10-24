@@ -7,10 +7,10 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; connect-src 'self' http: https: ws: wss:; img-src 'self' http: https: data: blob:; media-src 'self' http: https: blob:; style-src 'self'; script-src 'self'; object-src 'none'; base-uri 'none'"
     />
-    <title>IBM Sentinel AI</title>
+    <title>Sentinel</title>
     <link rel="icon" href="./assets/logo.png" type="image/png" />
     <link rel="stylesheet" href="./css/tokens.css?v=pro9" />
-    <link rel="stylesheet" href="./css/app.css?v=pro9" />
+    <link rel="stylesheet" href="./css/app.css?v=pro14" />
     <link rel="stylesheet" href="./css/activity.css?v=pro9" />
     <script src="./js/boot.js?v=pro9"></script>
   </head>
@@ -36,8 +36,6 @@
           <span class="splash__dia">SENTINEL</span>
         </p>
 
-        <p class="splash__tagline">IBM Sentinel AI. Independent staged demonstration. Not an official IBM product.</p>
-
         <div class="splash__progress" aria-hidden="true">
           <div class="splash__progress-fill"></div>
         </div>
@@ -57,7 +55,7 @@
           aria-label="Live Operations"
         >
           <div class="live-banner" data-live-banner role="region" aria-label="Current incident"></div>
-          <aside class="live-col live-col--left" data-live-left aria-label="Incidents"></aside>
+          <aside class="live-col live-col--left" data-live-left aria-label="Site plan and incidents"></aside>
           <div class="live-centre" data-live-centre>
             <div class="live-stage">
               <div id="cameras"></div>
@@ -65,7 +63,7 @@
             <div class="live-track" data-live-track></div>
             <div class="live-activity" data-live-activity></div>
           </div>
-          <aside class="live-col live-col--right" data-live-right aria-label="Site plan and call"></aside>
+          <aside class="live-col live-col--right" data-live-right aria-label="Call and model"></aside>
           <aside id="call-float" hidden></aside>
           <aside id="sidebar" hidden></aside>
         </section>
@@ -108,6 +106,6 @@
     <div id="dismiss" aria-hidden="true" hidden></div>
     <div id="op-dialog" aria-hidden="true" hidden></div>
 
-    <script type="module" src="./js/main.js?v=pro10"></script>
+    <script type="module" src="./js/main.js?v=pro15"></script>
   </body>
 </html>

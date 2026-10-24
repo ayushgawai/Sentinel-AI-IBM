@@ -583,14 +583,13 @@ export function mountCameras(root, store, actions, layout) {
   }
 
   /**
-   * Picture rect inside a w×h tile. Known footage aspect: contain on the
-   * Live hero, cover elsewhere. Unknown aspect (no footage yet): the hero
-   * assumes 16:9, other tiles use the whole tile as before. When the video
-   * file has black bands baked in (tile.bars), the rect is the whole frame
-   * placed so the real picture is centred (and fitted) instead.
+   * Picture rect inside a w×h tile. Live always contains the full frame
+   * (960×540 stays 16:9, gaps around it). Other pages cover the tile.
+   * Unknown aspect: Live assumes 16:9; other pages use the whole tile.
+   * Baked-in black bands are cropped only off Live.
    */
   function mediaRect(tile, w, h) {
-    const hero = Boolean(livePage) && tile.wrap.classList.contains("cam-slot--main");
+    const live = Boolean(livePage);
     let ar = 0;
     const vid = !tile.video.hidden && tile.video.videoWidth;
     if (vid) ar = tile.video.videoWidth / tile.video.videoHeight;
@@ -598,16 +597,16 @@ export function mountCameras(root, store, actions, layout) {
       ar = tile.streamImg.naturalWidth / tile.streamImg.naturalHeight;
     }
     if (!ar) {
-      if (!hero) return { x: 0, y: 0, w, h };
+      if (!live) return { x: 0, y: 0, w, h };
       ar = 16 / 9;
     }
-    const b = vid ? tile.bars : null;
+    const b = !live && vid ? tile.bars : null;
     // Content box in frame units (frame height = 1, width = ar).
     const cx0 = b ? b.x0 * ar : 0;
     const cy0 = b ? b.y0 : 0;
     const cw = b ? (b.x1 - b.x0) * ar : ar;
     const ch = b ? b.y1 - b.y0 : 1;
-    const scale = hero ? Math.min(w / cw, h / ch) : Math.max(w / cw, h / ch);
+    const scale = live ? Math.min(w / cw, h / ch) : Math.max(w / cw, h / ch);
     return {
       x: (w - cw * scale) / 2 - cx0 * scale,
       y: (h - ch * scale) / 2 - cy0 * scale,
@@ -619,8 +618,9 @@ export function mountCameras(root, store, actions, layout) {
   /** Place the video element on the band-corrected rect (or reset it). */
   function placeVideo(tile, w, h) {
     const st = tile.video.style;
-    if (!tile.bars || tile.video.hidden || !tile.video.videoWidth) {
-      if (st.width) {
+    // Live fit is the CSS contain rule. Inline fill would crop the frame.
+    if (livePage || !tile.bars || tile.video.hidden || !tile.video.videoWidth) {
+      if (st.left || st.top || st.width || st.height || st.objectFit) {
         st.left = st.top = st.width = st.height = st.objectFit = "";
       }
       return;
@@ -754,8 +754,7 @@ export function mountCameras(root, store, actions, layout) {
       return;
     }
 
-    // Where the picture actually sits in the tile: the Live hero shows the
-    // whole frame (object-fit: contain), other tiles fill it (cover).
+    // Where the picture sits: Live contains the whole frame; other pages cover.
     const fit = mediaRect(tile, w, h);
     const placed = [];
     for (const box of boxes) {

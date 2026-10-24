@@ -285,13 +285,13 @@ class VisionBridge:
                 shown = _display_overlays(list(paths), ovs, width, height)
                 for remapped in shown:
                     await self.hub.publish(remapped)
+                    record = self._reuse_from_overlay(remapped)
+                    if record is not None:
+                        await self.hub.publish(IncidentUpsert(incident=record))
                 # Release the wall frame after the boxes, so the picture
                 # the viewer paints is the one those boxes were measured on.
                 tick, self._tick = self._tick, asyncio.Event()
                 tick.set()
-                    record = self._reuse_from_overlay(remapped)
-                    if record is not None:
-                        await self.hub.publish(IncidentUpsert(incident=record))
                 for mode, esc, frames in packed:
                     if mode == "reuse":
                         record = self._reuse_record(esc)

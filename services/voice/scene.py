@@ -19,8 +19,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "data" / "feeds" / "seville_scene_script.json"
 
-SITE = "IBM Campus Sentinel Demo"
-ADDRESS = "1 New Orchard Road, Armonk, New York (demo-only)"
+SITE = "Spartan Complex"
+ADDRESS = "Spartan Complex"
 PLACE = {
     "CAM-01": "the ground-floor lobby",
     "CAM-02": "the east corridor on the ground floor",
@@ -189,9 +189,9 @@ def answer(question: str, t: float) -> str | None:
     armed = sum(w.values())
     if kind == "identity":
         return (f"This is Sentinel AI, the automated camera security system at {SITE}. "
-                f"I'm calling from the building's camera network, {ADDRESS}.")
+                f"I'm calling from the camera network at {SITE}.")
     if kind == "address":
-        return f"{SITE}, {ADDRESS}. The armed people are in {location(s)}."
+        return f"{SITE}. The armed people are in {location(s)}."
     if kind == "report":
         return f"Armed people inside {SITE}. I see {weapons_phrase(w)} in {location(s)}."
     if kind == "count":

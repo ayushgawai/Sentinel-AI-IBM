@@ -1,13 +1,13 @@
-"""Voice service — officer-driven 911 script + tool lookups (demo).
+"""Voice service — on-screen 911 conversation and live call answers.
 
-Real Parakeet ASR / Kokoro TTS / SignalWire stream transport is wired separately.
-Until then this agent simulates the dispatcher and keeps whereabouts up to date.
+Demo recording plays services.voice.demo_call on the transcript only.
+A live call speaks through the existing media bridge after the operator
+places it. Whereabouts stay current either way.
 """
 
 from __future__ import annotations
 
 import asyncio
-import os
 import re
 from dataclasses import dataclass
 from typing import Any, Awaitable, Callable
@@ -25,7 +25,7 @@ from services.brain.call_brief import scene_facts, site_config
 from services.brain.zrt_client import ZRTClient
 
 from . import scene
-from .demo_call import DEMO_CALL, OPENING
+from .demo_call import DEMO_CALL
 from .tools import TOOL_HANDLERS, ToolName
 
 PublishFn = Callable[[Any], Awaitable[None]]
@@ -39,10 +39,9 @@ class CallScriptStep:
     tool: ToolName | None = None
 
 
-# Officer Q&A for WEAPON demo. Sentinel only speaks map/camera facts + tools.
+# Officer Q&A. Sentinel only speaks map/camera facts + tools.
 WEAPON_SCRIPT: list[CallScriptStep] = [
-    CallScriptStep(0.3, "sentinel", "IBM Sentinel AI on a simulated line. No responder is connected."),
-    CallScriptStep(0.8, "dispatcher", "Go ahead — what are you reporting?"),
+    CallScriptStep(0.8, "dispatcher", "911, what's your emergency?"),
     CallScriptStep(
         0.6,
         "sentinel",
@@ -65,13 +64,32 @@ WEAPON_SCRIPT: list[CallScriptStep] = [
         "sentinel",
         "Subject last seen on {camera}. Adjacent cameras are monitored; I will update if they reappear.",
     ),
-    CallScriptStep(0.8, "dispatcher", "Copy. This is a staged demo line. Stay on the line for updates."),
+    CallScriptStep(0.8, "dispatcher", "Copy. Stay on the line for updates."),
     CallScriptStep(
         0.5,
         "sentinel",
-        "Acknowledged. I will keep reporting camera handoffs. This call remains simulated — not a live PSAP.",
+        "Acknowledged. I will keep reporting camera handoffs.",
     ),
 ]
+
+
+def heard(text: str) -> str:
+    """Transcript and phone audio: the place name is Spartan Complex."""
+    cleaned = re.sub(r"\s*\(demo-only\)", "", text or "", flags=re.I)
+    cleaned = re.sub(
+        r"\bIBM(?:\s+Campus)?(?:\s+Sentinel)?(?:\s+Demo)?(?:\s+Building\s+A)?\b",
+        "Spartan Complex",
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(
+        r"1 New Orchard Road(?:,\s*Armonk,\s*New York)?",
+        "Spartan Complex",
+        cleaned,
+        flags=re.I,
+    )
+    cleaned = re.sub(r"(Spartan Complex)(?:,\s*\1)+", r"\1", cleaned)
+    return re.sub(r"\s{2,}", " ", cleaned).strip()
 
 
 def handoff_line(camera_id: str, building: str = "") -> str:
@@ -141,7 +159,7 @@ class VoiceAgent:
         self._incident_id = rec.incident_id
         self._camera = rec.camera_id
         self._address = brief.address
-        self._building = brief.building or "IBM Demo Building A"
+        self._building = "Spartan Complex"
         self._site_address = str(site_config().get("address", brief.address))
         self._person = brief.person_description
         self._live_brief = brief
@@ -152,36 +170,38 @@ class VoiceAgent:
             name=f"call-{rec.incident_id}",
         )
 
-    async def start_scripted_call(self, rec: IncidentRecord) -> None:
-        """Demo recording: the scripted 911 call, each line at its clip second."""
+    async def start_scripted_call(
+        self, rec: IncidentRecord, brief: CallBrief | None = None
+    ) -> None:
+        """Demo recording: the on-screen 911 conversation. Does not dial."""
         if self.busy():
             return
         self._incident_id = rec.incident_id
         self._camera = rec.camera_id
+        self._building = "Spartan Complex"
+        self._address = "Spartan Complex"
+        self._site_address = "Spartan Complex"
         self._task = asyncio.create_task(
             self._run_scripted(rec.incident_id), name=f"demo-call-{rec.incident_id}"
         )
 
     async def _run_scripted(self, incident_id: str) -> None:
-        start = self.clock()
-        lines = [
-            line for i, line in enumerate(DEMO_CALL) if i < OPENING or line[0] >= start
-        ]
+        started = asyncio.get_running_loop().time()
         try:
-            for i, (at_s, speaker, text) in enumerate(lines):
-                # The opening is always spoken; later lines wait for their second.
-                wait = 1.5 if i < OPENING and at_s < start else at_s - self.clock()
+            for at_s, speaker, text in DEMO_CALL:
+                # One line per wait. The timestamp already includes speaking time.
+                wait = at_s - (asyncio.get_running_loop().time() - started)
                 if wait > 0:
                     await asyncio.sleep(wait)
                 await self.publish(
                     CallTranscriptDelta(
                         incident_id=incident_id,
                         speaker=speaker,  # type: ignore[arg-type]
-                        text=text,
+                        text=heard(text),
                         ts=utcnow(),
                     )
                 )
-            await asyncio.sleep(3600)  # stay "on the line" until Reset
+            await asyncio.sleep(3600)  # stay on the line until Reset
         finally:
             self._incident_id = None
 
@@ -191,19 +211,17 @@ class VoiceAgent:
         self._live = True
         self._incident_id = rec.incident_id
         self._camera = rec.camera_id
-        self._address = brief.address
-        self._building = brief.building or "IBM Demo Building A"
+        self._address = "Spartan Complex"
+        self._building = "Spartan Complex"
         self._person = brief.person_description
         self._live_brief = brief
         self._visible = True
         self._unknown_answer_index = 0
-        site = site_config()
-        self._site_address = str(site.get("address", brief.address))
-        text = (
-            "Hi, this is IBM Sentinel AI. "
-            "This is a staged demo call, never emergency services. "
-            f"I'm reporting armed people inside {self._building}. "
-            f"Address on file: {self._site_address}."
+        self._site_address = "Spartan Complex"
+        text = heard(
+            "Hi, this is Sentinel AI. "
+            "I'm reporting armed people inside Spartan Complex. "
+            "The address is Spartan Complex."
         )
         self._last_answer = text
         await self.publish(
@@ -242,6 +260,7 @@ class VoiceAgent:
         # Fixed questions answer instantly from the scene script at this clip second.
         fixed = scene.answer(question, self.clock())
         if fixed:
+            fixed = heard(fixed)
             self._last_answer = fixed
             await self.publish(
                 CallTranscriptDelta(
@@ -295,8 +314,13 @@ class VoiceAgent:
                 )
             ):
                 return ""
-            answer = ""  # no model round-trip on the call: instant fallback below
-            refusal = answer.strip().lower()
+            try:
+                answer = await asyncio.to_thread(
+                    self._zrt.answer_dispatcher, self._frame_facts(), question
+                )
+            except Exception:
+                answer = ""
+            refusal = heard(answer).strip().lower()
             if not answer or refusal.startswith(
                 ("the cameras do not confirm", "i cannot confirm", "i can't confirm")
             ):
@@ -308,6 +332,7 @@ class VoiceAgent:
                 self._unknown_answer_index += 1
             else:
                 answer = re.split(r"(?<=[.!?])\s+", answer, maxsplit=1)[0]
+        answer = heard(answer)
         self._last_answer = answer
         await self.publish(
             CallTranscriptDelta(
@@ -318,6 +343,21 @@ class VoiceAgent:
             )
         )
         return answer
+
+    def _frame_facts(self) -> dict[str, Any]:
+        """The current second of the locked scene script, for the answering model."""
+        t = float(self.clock())
+        snap = scene.at(t)
+        people, weapons = scene.steady(t)
+        return {
+            "place": "Spartan Complex",
+            "clip_second": int(t),
+            "camera_id": self._camera,
+            "location": scene.location(snap) if snap else "",
+            "people": people,
+            "weapons": weapons,
+            "scene": snap,
+        }
 
     def update_visual(
         self, camera_id: str, visible: bool, people: int | None = None, armed: int = 0
@@ -408,17 +448,6 @@ class VoiceAgent:
             "brief_dict": call_brief_to_dict(brief),
         }
         try:
-            await self.publish(
-                CallTranscriptDelta(
-                    incident_id=rec.incident_id,
-                    speaker="sentinel",
-                    text=(
-                        "Simulated 911 demo call to "
-                        f"{os.environ.get('CS_DEMO_TO_NUMBER', 'configured demo phone')} started."
-                    ),
-                    ts=utcnow(),
-                )
-            )
             await self.publish(
                 DemoControl(
                     action="scenario",

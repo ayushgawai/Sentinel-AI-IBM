@@ -85,7 +85,7 @@ normalised 0–1 units; camera video is served by `/mjpeg/{camera}` and
 
 - **SIMULATED** on every call and dispatch surface
 - No emergency number is ever dialed from the UI
-- Cameras remain numbered 1 to 6 and show canonical IBM demo site locations
+- Cameras remain numbered and show Demo Building locations
 - Event text rendered with `textContent`, never as HTML
 - Strict Content Security Policy (no inline script or style)
 

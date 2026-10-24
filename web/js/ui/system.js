@@ -15,8 +15,8 @@ import { icon } from "../icons.js?v=pro9";
 import { navigate } from "../router.js?v=pro9";
 import { now, subscribeTick } from "../clock.js?v=pro9";
 import { cameraStatus, onlineCount } from "../cameraStatus.js?v=pro9";
-import { STATUS_DOT, STATUS_LABEL, subscribeModelStatus } from "../modelStatus.js?v=pro9";
-import { createModelsTable } from "./modelsTable.js?v=pro9";
+import { STATUS_DOT, STATUS_LABEL, subscribeModelStatus } from "../modelStatus.js?v=pro11";
+import { createModelsTable } from "./modelsTable.js?v=pro11";
 import { FOCUS_CAMERA_EVENT } from "./cameras.js?v=pro9";
 import { mountUsageCard } from "./usageCard.js?v=pro9";
 
@@ -81,11 +81,10 @@ export function mountSystem(root, store) {
     ["Name", SITE.name],
     ["Type", SITE.type],
     ["Timezone", SITE.timezone],
-    ["Product", "IBM Sentinel AI"],
-    ["Disclosure", "Independent staged demonstration. Not an official IBM product."],
-    ["Demo mode", "Staged playback. Not live CCTV."],
+    ["Product", "Sentinel"],
+    ["Cameras", "Playback on the camera wall."],
     ["Detection", "YOLO person tracking on playback. Weapon boxes are a precomputed timeline. Qwen is a local VLM and runs only when that runtime is up."],
-    ["Dispatch", "Simulated unless calls are explicitly enabled. Then only the verified demo handset."],
+    ["Dispatch", "A 911 call is placed when an operator starts it."],
   ]) {
     if (!v) continue;
     const row = el("div", { className: "sys-kv__row" });

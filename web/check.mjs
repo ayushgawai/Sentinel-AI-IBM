@@ -79,6 +79,14 @@ assert.match(html, /media-src[^;]*http:/);
 const liveCallSource = readFileSync(new URL("./js/ui/call.js", import.meta.url), "utf8");
 assert.doesNotMatch(liveCallSource, /subtitleLines:\s*5/);
 
+// The live page must fetch the full-transcript renderer by a fresh module URL.
+// Without this chain, a browser can retain the former five-line subtitle module.
+const mainSource = readFileSync(new URL("./js/main.js", import.meta.url), "utf8");
+const liveSource = readFileSync(new URL("./js/ui/live.js", import.meta.url), "utf8");
+assert.match(html, /main\.js\?v=pro16/);
+assert.match(mainSource, /live\.js\?v=pro16/);
+assert.match(liveSource, /call\.js\?v=pro10/);
+
 const stack = ["YOLO", "VADCLIP", "ByteTrack", "watsonx", "BeeAI", "Granite Guardian"];
 assert.deepEqual(
   trackCardRows().map((r) => [r.name, r.detail, r.active]),

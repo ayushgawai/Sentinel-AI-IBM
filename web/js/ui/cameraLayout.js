@@ -18,15 +18,12 @@ const RING_MOVE_MS = 600;
 
 /**
  * Watch-mode ring: slot angle per camera (0° = right, clockwise, y down).
- * Six tiles in a hexagon around the round site map.
+ * The three wall cameras sit on the left and upper arc around the site map.
  */
 const RING_SLOTS = {
   "cam-01": 180,
   "cam-02": 300,
   "cam-03": 240,
-  "cam-04": 0,
-  "cam-05": 120,
-  "cam-06": 60,
 };
 
 /** Distance from (px, py) to the nearest point of a rect (0 inside). */
@@ -313,7 +310,7 @@ export function createCameraLayout() {
       matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (opts.ring && planResult.mains.length === 0) {
-      // Six 16:9 tiles on an ellipse around the stage centre; the site map
+      // The wall cameras on an ellipse around the stage centre; the site map
       // disc fills the largest circle that clears every tile.
       const W = stageW;
       const H = stageH;
@@ -359,17 +356,24 @@ export function createCameraLayout() {
     }
 
     if (planResult.mode === "grid" || planResult.mains.length === 0) {
-      // 3×2 filling the stage (tiles fill cells; ~16:9 on typical consoles)
-      const cols = 3;
-      const rows = 2;
-      const tw = (stageW - gap * (cols - 1)) / cols;
-      const th = (stageH - gap * (rows - 1)) / rows;
-      WALL_CAMERA_IDS.forEach((id, i) => {
-        const c = i % cols;
-        const r = Math.floor(i / cols);
+      // One 16:9 row of the cameras that exist, centred in the stage.
+      // A 3×2 grid left a blank row under CAM-01–03.
+      const ids = WALL_CAMERA_IDS;
+      const n = Math.max(1, ids.length);
+      let tw = (stageW - gap * (n - 1)) / n;
+      let th = (tw * 9) / 16;
+      if (th > stageH) {
+        th = stageH;
+        tw = Math.min((stageW - gap * (n - 1)) / n, (th * 16) / 9);
+        th = (tw * 9) / 16;
+      }
+      const rowW = n * tw + gap * (n - 1);
+      const x0 = Math.max(0, (stageW - rowW) / 2);
+      const y0 = Math.max(0, (stageH - th) / 2);
+      ids.forEach((id, i) => {
         map.set(id, {
-          x: c * (tw + gap),
-          y: r * (th + gap),
+          x: x0 + i * (tw + gap),
+          y: y0,
           w: tw,
           h: th,
           role: "grid",

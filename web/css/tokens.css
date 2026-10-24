@@ -1,4 +1,4 @@
-/* IBM Sentinel AI. Carbon neutrals and IBM blue. Not an official IBM theme. */
+/* Sentinel. Carbon neutrals and blue accent. */
 
 :root {
   /* Neutrals — main shell is Carbon; floating panels carry the dots */
@@ -63,7 +63,7 @@
   --text-muted: #95a3b3;
   --text-faint: #a3b0be;
 
-  /* Brand accent: IBM blue #0f62fe */
+  /* Brand accent: #0f62fe */
   --aqua: #0f62fe;
   --aqua-strong: #78a9ff;
   --aqua-bg: rgba(15, 98, 254, 0.14);
@@ -202,7 +202,7 @@
   --call-panel-w: 400px;
   --call-panel-min-w: 380px;
   --wall-min-w: 560px;
-  /* Live page columns in incident mode (watch mode is one full stage).
+  /* Live page side columns (incidents | cameras | call and model).
      332 / 404 up to 1599px wide, 372 / 444 from 1600px. */
   --live-left: 332px;
   --live-right: 404px;

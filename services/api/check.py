@@ -417,6 +417,7 @@ async def main() -> None:
     srv.hub._voice = None
     saved_mode = os.environ.get("CS_CALL_MODE")
     try:
+        os.environ["CS_CALL_MODE"] = "live"
         for unknown in ("full", "quiet", "medical_fall", "nope"):
             reply = await srv.hub.handle_cmd({"cmd": "runScenario", "scenario_id": unknown})
             assert reply["ok"] is False and "unknown scenario" in reply["error"]
@@ -438,6 +439,9 @@ async def main() -> None:
         )
         os.environ["CS_CALL_MODE"] = "scripted"
         outcomes[:] = [{"ok": True, "call_sid": "CA-would-dial"}]
+        # The recording is explicitly on-screen only. A stale live-call
+        # guardrail must never suppress its deterministic transcript.
+        DEFAULT_GUARDRAILS._dispatched.add(vision.incident_id)
         await srv.hub._on_incident(vision)
         assert placed == [], "demo recording must not dial"
         assert srv.hub._voice_agent().busy(), "a severe weapon starts the on-screen call"

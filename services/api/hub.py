@@ -229,6 +229,7 @@ class DemoHub:
     async def _maybe_start_voice(self, rec: Any, *, operator_requested: bool = False) -> bool:
         if getattr(rec, "severity", None) is not Severity.SEVERE:
             return False
+        demo_recording = scripted_call_mode()
         async with self._dispatch_lock:
             if self._voice_agent().busy():
                 await self.publish(
@@ -239,16 +240,28 @@ class DemoHub:
                     )
                 )
                 return False
-            if not operator_requested and not _real_weapon_detection(rec):
+            if (
+                not operator_requested
+                and not demo_recording
+                and not _real_weapon_detection(rec)
+            ):
                 return False
             from services.voice.signalwire_bridge import load_config, place_call
 
             provider = load_config()
-            ok, reason = DEFAULT_GUARDRAILS.can_dispatch(rec.incident_id)
-            if ok and provider and _scripted(rec) and not operator_requested:
-                # A scenario playback never places a call.
-                ok, reason = False, "scripted_scenario"
+            if demo_recording:
+                # The recording is entirely on-screen: there is no outbound
+                # action for a dispatch guardrail or model review to protect.
+                # Its fixed transcript must begin for every reset run.
+                ok, reason = True, "scripted_demo"
+            else:
+                ok, reason = DEFAULT_GUARDRAILS.can_dispatch(rec.incident_id)
+                if ok and provider and _scripted(rec) and not operator_requested:
+                    # A scenario playback never places a live phone call.
+                    ok, reason = False, "scripted_scenario"
             if (
+                not demo_recording
+                and
                 getattr(rec, "class_token", None) is IncidentClass.WEAPON
                 and not _scripted(rec)
             ):
@@ -280,7 +293,8 @@ class DemoHub:
                     "DISPATCH_PENDING",
                     "Operator requested dispatch",
                 )
-            DEFAULT_GUARDRAILS.record_dispatch(rec.incident_id)
+            if not demo_recording:
+                DEFAULT_GUARDRAILS.record_dispatch(rec.incident_id)
             brief = assemble_call_brief(rec)
             now = _utcnow()
             rec.state = IncidentState.DISPATCHED

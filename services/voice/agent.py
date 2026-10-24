@@ -25,7 +25,7 @@ from services.brain.call_brief import scene_facts, site_config
 from services.brain.zrt_client import ZRTClient
 
 from . import scene
-from .demo_call import DEMO_CALL
+from .demo_call import schedule
 from .tools import TOOL_HANDLERS, ToolName
 
 PublishFn = Callable[[Any], Awaitable[None]]
@@ -178,7 +178,8 @@ class VoiceAgent:
     async def _run_scripted(self, incident_id: str) -> None:
         started = asyncio.get_running_loop().time()
         try:
-            for at_s, speaker, text in DEMO_CALL:
+            # Keyed to the clip second the wall shows as the call connects.
+            for at_s, speaker, text in schedule(self.clock()):
                 # One line per wait. The timestamp already includes speaking time.
                 wait = at_s - (asyncio.get_running_loop().time() - started)
                 if wait > 0:

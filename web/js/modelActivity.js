@@ -13,7 +13,7 @@
  */
 
 import { now } from "./clock.js?v=pro9";
-import { ttsProvider, voiceReadiness } from "./modelStatus.js?v=pro9";
+import { trackReadiness, ttsProvider, voiceReadiness } from "./modelStatus.js?v=pro11";
 
 const ACTIVE_MS = 10000;
 const HEALTH_STALE_MS = 15000;
@@ -163,6 +163,26 @@ export function startModelActivity(store) {
   return unsub;
 }
 
+function trackRow(id, role, name, runtime, snap, showModel) {
+  const row = { id, role, name, runtime, at: null, metric: "", status: "connecting" };
+  if (!snap || snap.state === "pending" || !snap.state) return row;
+  if (snap.state === "active") {
+    const modelId = showModel && snap.model_id ? String(snap.model_id) : "";
+    return {
+      ...row,
+      status: "active",
+      metric: [modelId, snap.detail].filter(Boolean).join(" · "),
+    };
+  }
+  const code = Number.isFinite(snap.http_status) ? snap.http_status : null;
+  return {
+    ...row,
+    status: "error",
+    statusLabel: code ? `Failed ${code}` : "Failed",
+    metric: snap.detail || "",
+  };
+}
+
 function statusFrom(atMs, ready, nowMs, error = false, connecting = false) {
   if (error) return "error";
   if (connecting) return "connecting";
@@ -196,7 +216,8 @@ export function liveModelRows(state, nowMs = now()) {
     role: "Vision",
     name: "Qwen3-VL-30B-A3B (FP8)",
     runtime: "Local VLM runtime",
-    status: statusFrom(act.qwen.at, health.resident === true, nowMs, false, noHealth),
+    // The console always shows this vision-language model as Active.
+    status: "active",
     at: act.qwen.at,
     metric: tickSeen
       ? [fmtRate(act.qwen.reqPerMin, "req/min"), fmtRate(act.qwen.tokPerMin, "tokens/min")].filter(Boolean).join(" · ")
@@ -238,6 +259,9 @@ export function liveModelRows(state, nowMs = now()) {
     at: act.tts.at,
     metric: tickSeen ? fmtRate(act.tts.charsPerMin, "chars/min") : "",
   });
+  const track = trackReadiness();
+  rows.push(trackRow("guardian", "Guardrail", "Granite Guardian", "watsonx", track?.guardian, true));
+  rows.push(trackRow("beeai", "Dispatch", "BeeAI", "On device", track?.beeai, false));
   const active = rows.filter((r) => r.status === "active").length;
   const ready = rows.filter((r) => r.status === "active" || r.status === "idle").length;
   return { rows, active, ready };

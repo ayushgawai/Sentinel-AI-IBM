@@ -21,7 +21,7 @@ So we asked: what if one AI could watch every camera, and when it's sure somethi
 
 ## How we built it
 
-![Sentinel AI technical architecture](https://raw.githubusercontent.com/ayushgawai/Sentinel-AI-IBM/main/docs/assets/architecture-technical.png)
+![Sentinel AI technical architecture](https://cdn.jsdelivr.net/gh/ayushgawai/Sentinel-AI-IBM@main/docs/assets/architecture-technical.png)
 
 - **Vision router (Python):** OpenCV/FFmpeg decode → **YOLO26s-pose** → **ByteTrack** → temporal pose rules + **OpenCLIP ViT-B/16** anomaly scoring. It is tuned for **recall**: a false positive here costs a few milliseconds of GPU time, while a miss costs everything.
 - **Brain:** escalated clips go to **Qwen3-VL-30B-A3B (FP8)** on a local OpenAI-compatible runtime. It's a 30B mixture-of-experts model with only about 3B parameters active per step, so it fits on one GPU next to YOLO.

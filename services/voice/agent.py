@@ -366,7 +366,24 @@ class VoiceAgent:
             return
         if camera_id == self._camera:
             return
-        if self._live or self._scripted:
+        if self._scripted:
+            # Transcript timing belongs exclusively to DEMO_CALL. Vision
+            # handoffs still keep scenario state current, but never insert an
+            # early or duplicate spoken update.
+            self._camera = camera_id
+            self._address = address
+            self._visible = True
+            if self._live_brief is not None:
+                self._live_brief.camera_id = camera_id
+                self._live_brief.address = address
+            await self.publish(
+                DemoControl(
+                    action="scenario",
+                    scenario_id=f"security_alert:{camera_id}",
+                    ts=utcnow(),
+                )
+            )
+        elif self._live:
             await self._publish_update(camera_id, address)
         else:
             await self._update_q.put((camera_id, address))
@@ -391,12 +408,6 @@ class VoiceAgent:
             self._live_brief.camera_id = camera_id
             self._live_brief.address = address
         report = scene.update_line(previous.upper(), camera_id.upper())
-        if self._scripted:
-            report = {
-                "cam-01": "Update: They have returned to the lobby.",
-                "cam-02": "Update: They have moved into the east corridor.",
-                "cam-03": "Update: They have moved into the west corridor.",
-            }.get(camera_id.lower(), "Update: They have moved to another area.")
         await self.publish(
             CallTranscriptDelta(
                 incident_id=self._incident_id or "",

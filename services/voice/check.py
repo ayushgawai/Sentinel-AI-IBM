@@ -305,7 +305,7 @@ async def _main() -> None:
         scripted_events.append(ev)
 
     demo = VoiceAgent(scripted_pub, zrt=qwen)  # type: ignore[arg-type]
-    demo.clock = lambda: 331.5
+    demo.clock = lambda: 0.0
     await demo.start_scripted_call(rec, assemble_call_brief(rec))
     await asyncio.sleep(1.0)
     assert len(scripted_events) == 1, scripted_events
@@ -316,16 +316,34 @@ async def _main() -> None:
     assert len(said) == 2, said
     assert said[1] == (
         "sentinel",
-        "Hi, this is IBM Sentinel AI at IBM Demo Building A.",
+        "Hi, this is Sentinel AI. I'm reporting armed people in the ground-floor lobby.",
     ), said
     script_blob = " ".join(text for _, text in said).lower()
     assert "simulat" not in script_blob and "psap" not in script_blob
     assert "deterministic" not in script_blob and "never emergency" not in script_blob
-    from services.voice.demo_call import DEMO_CALL as _LINES, speak_s, BEAT_S
+    from services.voice.demo_call import DEMO_CALL as _LINES
 
-    assert abs((_LINES[1][0] - _LINES[0][0]) - (speak_s(_LINES[0][2]) + BEAT_S)) < 0.02
-    # The reference-style scripted call reports movement as a concise,
-    # one-way Sentinel update. The dispatcher does not narrate the camera.
+    # The demo transcript is the source of truth: it is tied to the three
+    # camera feeds rather than generated from variable frame detections.
+    assert _LINES[1][0] == 3.5
+    assert DURATION == 339.8
+    expected_handoffs = {
+        (60.0, "sentinel", "Update: They have moved into the east corridor."),
+        (63.5, "dispatcher", "Copy. I have the east-corridor update."),
+        (117.0, "sentinel", "Update: They have moved into the west corridor."),
+        (120.5, "dispatcher", "Copy. I have the west-corridor update."),
+        (216.6, "sentinel", "Update: They are turning back toward the east corridor."),
+        (220.0, "dispatcher", "Copy. I have the change in direction."),
+        (230.2, "sentinel", "Update: They have moved back into the east corridor."),
+        (233.7, "dispatcher", "Copy. I have the east-corridor update."),
+        (267.8, "sentinel", "Update: They have returned to the lobby."),
+        (271.3, "dispatcher", "Copy. I have the lobby update."),
+    }
+    assert expected_handoffs.issubset(set(_LINES)), _LINES
+    assert not any("ibm" in text.lower() for _, _, text in _LINES), _LINES
+
+    # A real camera handoff only updates internal call context. It must not
+    # insert an out-of-order transcript message into the fixed demo timeline.
     scripted_events.clear()
     demo = VoiceAgent(scripted_pub, zrt=qwen)  # type: ignore[arg-type]
     await demo.start_scripted_call(rec, assemble_call_brief(rec))
@@ -334,7 +352,7 @@ async def _main() -> None:
     await asyncio.sleep(1.2)
     handoff_events = scripted_events[event_count:]
     handoff_lines = [getattr(event, "text", "") for event in handoff_events]
-    assert "Update: They have moved into the east corridor." in handoff_lines, handoff_lines
+    assert not any(line.startswith("Update:") for line in handoff_lines), handoff_lines
     await asyncio.sleep(2.6)
     handoff_events = scripted_events[event_count:]
     handoff_lines = [getattr(event, "text", "") for event in handoff_events]

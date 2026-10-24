@@ -1,78 +1,62 @@
-"""On-screen 911 conversation for demo recordings. No phone is dialed.
+"""Fixed on-screen 911 call for the three-camera demo.
 
-Each line is held for the time it takes to say it at about 150 words per
-minute. A change of speaker adds one second of silence before the next line.
+The visual demo has one known 339.8-second camera timeline. Keeping this
+transcript on that same clock makes the dialogue repeatable and prevents
+frame-level detector changes from changing what the call says.
 """
 
 from __future__ import annotations
 
-WPM = 120
-BEAT_S = 1.8
-# (speaker, text). Timestamps are derived; do not hand-tune them.
-_LINES: list[tuple[str, str]] = [
-    ("dispatcher", "911, what's your emergency?"),
-    ("sentinel", "Hi, this is IBM Sentinel AI at IBM Demo Building A."),
-    ("sentinel", "I'm reporting armed people in the ground-floor lobby."),
-    ("sentinel", "One moment."),
-    ("sentinel", "I can see handguns, a knife, and a long firearm in the ground-floor lobby."),
-    ("dispatcher", "Okay, how many people do you see?"),
-    ("sentinel", "Give me a moment."),
-    ("sentinel", "Eight people are visible. Six appear armed."),
+# The final video frame is at 339.8 seconds. Entries are absolute seconds
+# from scenario start and coincide with the camera handoffs in the media.
+DURATION = 339.8
+DEMO_CALL: list[tuple[float, str, str]] = [
+    (0.0, "dispatcher", "911, what's your emergency?"),
+    (3.5, "sentinel", "Hi, this is Sentinel AI. I'm reporting armed people in the ground-floor lobby."),
+    (11.0, "sentinel", "One moment."),
+    (14.5, "sentinel", "I can see handguns, a knife, and a long firearm in the ground-floor lobby."),
+    (22.5, "dispatcher", "Okay, how many people do you see?"),
+    (26.0, "sentinel", "Give me a moment."),
+    (30.0, "sentinel", "Eight people are visible. Six appear armed."),
+    (60.0, "sentinel", "Update: They have moved into the east corridor."),
+    (63.5, "dispatcher", "Copy. I have the east-corridor update."),
+    (117.0, "sentinel", "Update: They have moved into the west corridor."),
+    (120.5, "dispatcher", "Copy. I have the west-corridor update."),
+    (216.6, "sentinel", "Update: They are turning back toward the east corridor."),
+    (220.0, "dispatcher", "Copy. I have the change in direction."),
+    (230.2, "sentinel", "Update: They have moved back into the east corridor."),
+    (233.7, "dispatcher", "Copy. I have the east-corridor update."),
+    (267.8, "sentinel", "Update: They have returned to the lobby."),
+    (271.3, "dispatcher", "Copy. I have the lobby update."),
 ]
 
 
-def speak_s(text: str) -> float:
-    """Seconds to speak `text` at WPM. One word is the minimum."""
-    words = [w for w in text.split() if w]
-    return max(1, len(words)) * 60.0 / WPM
-
-
-def paced(lines: list[tuple[str, str]]) -> list[tuple[float, str, str]]:
-    """Absolute start time for each line. The next line starts only after this one is spoken."""
-    t = 0.0
-    out: list[tuple[float, str, str]] = []
-    prev = ""
-    for speaker, text in lines:
-        if prev and speaker != prev:
-            t += BEAT_S
-        out.append((round(t, 3), speaker, text))
-        t += speak_s(text)
-        prev = speaker
-    return out
-
-
-DEMO_CALL: list[tuple[float, str, str]] = paced(_LINES)
-DURATION = round(DEMO_CALL[-1][0] + speak_s(DEMO_CALL[-1][2]), 3)
-
-
 def line_waits() -> list[tuple[float, str, str]]:
-    """Seconds the player waits after the previous line before showing this one."""
+    """Seconds to wait after the preceding transcript event."""
     waits: list[tuple[float, str, str]] = []
-    prev_t = 0.0
-    for i, (at_s, speaker, text) in enumerate(DEMO_CALL):
-        waits.append((0.0 if i == 0 else round(at_s - prev_t, 3), speaker, text))
-        prev_t = at_s
+    previous = 0.0
+    for index, (at_s, speaker, text) in enumerate(DEMO_CALL):
+        waits.append((0.0 if index == 0 else round(at_s - previous, 3), speaker, text))
+        previous = at_s
     return waits
 
 
 def _check() -> None:
-    banned = ("simulat", "psap", "deterministic", "never emergency", "never-emergency")
-    assert DEMO_CALL[0][0] == 0.0
+    banned = ("ibm", "simulat", "psap", "deterministic", "never emergency", "never-emergency")
+    assert DURATION == 339.8
+    assert DEMO_CALL[0] == (0.0, "dispatcher", "911, what's your emergency?")
     assert DEMO_CALL[-1][0] < DURATION
+    assert all(next_at > at_s for (at_s, _, _), (next_at, _, _) in zip(DEMO_CALL, DEMO_CALL[1:]))
     blob = " ".join(text for _, _, text in DEMO_CALL).lower()
-    assert "ibm demo building a" in blob
     assert not any(word in blob for word in banned)
-    prev_t, prev_speaker, prev_text = DEMO_CALL[0]
-    for at_s, speaker, text in DEMO_CALL[1:]:
-        gap = at_s - prev_t
-        need = speak_s(prev_text) + (BEAT_S if speaker != prev_speaker else 0.0)
-        assert gap + 1e-6 >= need, (gap, need, prev_text)
-        assert at_s > prev_t
-        prev_t, prev_speaker, prev_text = at_s, speaker, text
+    assert (60.0, "sentinel", "Update: They have moved into the east corridor.") in DEMO_CALL
+    assert (117.0, "sentinel", "Update: They have moved into the west corridor.") in DEMO_CALL
+    assert (230.2, "sentinel", "Update: They have moved back into the east corridor.") in DEMO_CALL
+    assert (267.8, "sentinel", "Update: They have returned to the lobby.") in DEMO_CALL
 
 
 if __name__ == "__main__":
     _check()
     for wait, speaker, text in line_waits():
         print(f"{wait:5.2f}s  {speaker:10}  {text}")
-    print(f"demo call {DURATION:.1f}s OK")
+    print(f"demo timeline {DURATION:.1f}s OK")

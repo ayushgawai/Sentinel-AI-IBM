@@ -23,12 +23,8 @@ _LINES: list[tuple[str, str]] = [
     ("sentinel", "Give me a moment."),
     ("sentinel", "Eight people in the ground-floor lobby."),
     ("sentinel", "Six of them are armed."),
-    (
-        "sentinel",
-        "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor.",
-    ),
-    ("dispatcher", "Stay on the line."),
-    ("sentinel", "Understood. I'll stay on the line and report every camera change."),
+    ("dispatcher", "Stay with them and let me know when their location changes."),
+    ("sentinel", "Understood. I'll report each camera change."),
 ]
 
 

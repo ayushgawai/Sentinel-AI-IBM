@@ -329,12 +329,19 @@ async def _main() -> None:
     await demo.start_scripted_call(rec, assemble_call_brief(rec))
     event_count = len(scripted_events)
     await demo.notify_whereabouts("cam-02", assemble_call_brief(rec).address)
-    handoff_lines = [
-        getattr(event, "text", "") for event in scripted_events[event_count:]
+    await asyncio.sleep(1.1)
+    handoff_events = scripted_events[event_count:]
+    handoff_lines = [getattr(event, "text", "") for event in handoff_events]
+    handoff_speakers = [
+        getattr(event, "speaker", "") for event in handoff_events
     ]
     assert (
         "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor."
         in handoff_lines
+    ), handoff_lines
+    assert "dispatcher" in handoff_speakers, handoff_events
+    assert any(
+        "keep tracking" in text.lower() for text in handoff_lines
     ), handoff_lines
     await demo.cancel()
     assert DURATION > _LINES[-1][0]

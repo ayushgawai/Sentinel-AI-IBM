@@ -128,6 +128,7 @@ class VoiceAgent:
         self._live = False
         self._scripted = False
         self._incident_id: str | None = None
+        self._scripted_reply_tasks: set[asyncio.Task[None]] = set()
         self._camera = ""
         self._address = ""
         self._building = ""
@@ -204,10 +205,81 @@ class VoiceAgent:
                         ts=utcnow(),
                     )
                 )
-            await asyncio.sleep(3600)  # stay on the line until Reset
+            # The opening establishes the emergency.  The rest of the call
+            # follows the camera wall's playback clock, rather than ending on
+            # a fixed script.
+            next_check_in = int(self.clock()) + 12
+            while True:
+                await asyncio.sleep(0.5)
+                if int(self.clock()) < next_check_in:
+                    continue
+                await self._publish_scripted_check_in(incident_id)
+                next_check_in = int(self.clock()) + 20
         finally:
             self._scripted = False
             self._incident_id = None
+            for task in tuple(self._scripted_reply_tasks):
+                task.cancel()
+            self._scripted_reply_tasks.clear()
+
+    async def _publish_scripted_check_in(self, incident_id: str) -> None:
+        """Keep the on-screen responder conversation aligned with playback."""
+        if not self._scripted or incident_id != self._incident_id:
+            return
+        await self.publish(
+            CallTranscriptDelta(
+                incident_id=incident_id,
+                speaker="dispatcher",
+                text="Copy. Do you still have them in view?",
+                ts=utcnow(),
+            )
+        )
+        await asyncio.sleep(0.8)
+        if not self._scripted or incident_id != self._incident_id:
+            return
+        status = scene.answer("status", self.clock())
+        await self.publish(
+            CallTranscriptDelta(
+                incident_id=incident_id,
+                speaker="sentinel",
+                text=status or "I still have them in view and will report any change.",
+                ts=utcnow(),
+            )
+        )
+
+    async def _publish_scripted_handoff_reply(self, incident_id: str) -> None:
+        """Answer a real camera handoff with a natural responder turn."""
+        await asyncio.sleep(0.75)
+        if not self._scripted or incident_id != self._incident_id:
+            return
+        await self.publish(
+            CallTranscriptDelta(
+                incident_id=incident_id,
+                speaker="dispatcher",
+                text="Copy. Keep tracking the group and advise if their direction changes.",
+                ts=utcnow(),
+            )
+        )
+        await asyncio.sleep(0.8)
+        if not self._scripted or incident_id != self._incident_id:
+            return
+        status = scene.answer("status", self.clock())
+        await self.publish(
+            CallTranscriptDelta(
+                incident_id=incident_id,
+                speaker="sentinel",
+                text=status or "I still have them in view and will report any change.",
+                ts=utcnow(),
+            )
+        )
+
+    def _schedule_scripted_handoff_reply(self, incident_id: str) -> None:
+        task = asyncio.create_task(
+            self._publish_scripted_handoff_reply(incident_id),
+            name=f"demo-call-reply-{incident_id}",
+        )
+        self._scripted_reply_tasks.add(task)
+        task.add_done_callback(self._scripted_reply_tasks.discard)
 
     async def start_live_call(self, rec: IncidentRecord, brief: CallBrief) -> None:
         if self.busy():
@@ -381,6 +453,8 @@ class VoiceAgent:
             await self._publish_update(camera_id, address)
         else:
             await self._update_q.put((camera_id, address))
+        if self._scripted and self._incident_id:
+            self._schedule_scripted_handoff_reply(self._incident_id)
 
     async def cancel(self) -> None:
         self._live = False

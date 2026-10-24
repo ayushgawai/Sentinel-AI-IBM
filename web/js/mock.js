@@ -471,7 +471,7 @@ function pushStream(script, { incident_id, speaker, at, text, gap = 0.28 }) {
 }
 
 /**
- * ~30s simulated dispatch exchange after DISPATCHED.
+ * ~30s on-screen dispatch exchange after DISPATCHED.
  * Tool cards fire before the Sentinel sentence that uses their results.
  */
 function pushCallExchange(script, severeAt) {

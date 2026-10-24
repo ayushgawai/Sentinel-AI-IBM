@@ -4,12 +4,12 @@ import { createStore } from "./store.js?v=pro9";
 import { start } from "./transport.js?v=pro10";
 import { createActions } from "./actions.js?v=pro9";
 import { startRouter, getRoute, navigate } from "./router.js?v=pro9";
-import { mountTopbar } from "./ui/topbar.js?v=pro9";
+import { mountTopbar } from "./ui/topbar.js?v=pro11";
 import { mountBanner } from "./ui/banner.js?v=pro9";
-import { mountCameras } from "./ui/cameras.js?v=pro10";
+import { mountCameras } from "./ui/cameras.js?v=pro11";
 import { createCameraLayout } from "./ui/cameraLayout.js?v=pro9";
 import { mountSidebar } from "./ui/sidebar.js?v=pro9";
-import { mountLive } from "./ui/live.js?v=pro9";
+import { mountLive } from "./ui/live.js?v=pro15";
 import { mountCallPage } from "./ui/callpage.js?v=pro9";
 import { startCallRecorder } from "./callHistory.js?v=pro9";
 import { mountCallPanel } from "./ui/call.js?v=pro9";
@@ -17,16 +17,16 @@ import { mountDemo } from "./ui/demo.js?v=pro9";
 import { mountDismiss } from "./ui/dismiss.js?v=pro9";
 import { mountOperator } from "./ui/operator.js?v=pro9";
 import { mountIncidents } from "./ui/incidents.js?v=pro9";
-import { mountSystem } from "./ui/system.js?v=pro9";
+import { mountSystem } from "./ui/system.js?v=pro11";
 import { startAutoFollow } from "./ui/autofollow.js?v=pro9";
 import { playSplash, shouldHoldMockForSplash } from "./ui/splash.js?v=pro9";
-import { startModelStatus } from "./modelStatus.js?v=pro9";
+import { startModelStatus } from "./modelStatus.js?v=pro11";
 import { startUsage } from "./usage.js?v=pro9";
-import { startModelActivity } from "./modelActivity.js?v=pro9";
+import { startModelActivity } from "./modelActivity.js?v=pro11";
 import { noteEvent } from "./cameraStatus.js?v=pro9";
 import { subscribeTick } from "./clock.js?v=pro9";
 import * as cameraSources from "./cameraSources.js?v=pro9";
-import { mountActivity } from "./ui/activity.js?v=pro9";
+import { mountActivity } from "./ui/activity.js?v=pro15";
 
 const store = createStore();
 const layoutCtl = createCameraLayout();
@@ -89,8 +89,7 @@ const sidebarApi = mountSidebar(
 // Live columns: incidents, the single site map, tracking card and call.
 mountLive(document.getElementById("page-live"), store, actions, layoutCtl, cameraWall);
 mountActivity(document.querySelector("[data-live-activity]"), store);
-// Tab title stays "Sentinel · Security Console" (index.html). All-time
-// tokens show in the Live activity strip, not in the title.
+// Tab title stays "Sentinel · Security Console" (index.html).
 
 document.addEventListener("sentinel:open-call-panel", () => callPanelApi.open());
 

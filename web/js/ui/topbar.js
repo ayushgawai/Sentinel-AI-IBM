@@ -10,8 +10,8 @@ import {
 } from "../format.js?v=pro9";
 import { el as h, setText } from "../dom.js?v=pro9";
 import { MODELS_SUBTITLE, MODELS_TITLE } from "../models.js?v=pro9";
-import { STATUS_DOT, STATUS_LABEL, subscribeModelStatus } from "../modelStatus.js?v=pro9";
-import { createModelsTable } from "./modelsTable.js?v=pro9";
+import { STATUS_DOT, STATUS_LABEL, subscribeModelStatus } from "../modelStatus.js?v=pro11";
+import { createModelsTable } from "./modelsTable.js?v=pro11";
 import { LOGO_MARK } from "../logo.js?v=pro9";
 import { now, subscribeTick } from "../clock.js?v=pro9";
 import { WALL_CAMERA_IDS } from "../site.js?v=pro9";
@@ -20,11 +20,10 @@ import { cameraStatus, onlineCount } from "../cameraStatus.js?v=pro9";
 export function mountTopbar(el, store, actions, layoutCtl) {
   el.innerHTML = `
     <div class="topbar">
-      <div class="topbar__brand" aria-label="IBM Sentinel AI">
+      <div class="topbar__brand" aria-label="Sentinel">
         ${LOGO_MARK}
         <div class="topbar__titles">
-          <div class="topbar__wordmark">IBM Sentinel AI</div>
-          <p class="topbar__disclosure">Staged demo. Not an official IBM product.</p>
+          <div class="topbar__wordmark">Sentinel</div>
         </div>
       </div>
 
@@ -43,7 +42,7 @@ export function mountTopbar(el, store, actions, layoutCtl) {
       <div class="topbar__right">
         <button type="button" class="btn btn--secondary btn--sm" data-topbar-reset title="Start the demo from the beginning (tokens and counters keep counting)">Reset</button>
         <span class="topbar__reconnect" data-reconnect hidden>Reconnecting</span>
-        <span class="ochip ochip--state topbar__playback" data-playback hidden>Deterministic demo</span>
+        <span class="ochip ochip--state topbar__playback" data-playback hidden>Playback</span>
         <time class="topbar__clock metric mono" data-clock></time>
       </div>
     </div>

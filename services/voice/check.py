@@ -309,7 +309,7 @@ async def _main() -> None:
     await demo.start_scripted_call(rec, assemble_call_brief(rec))
     await asyncio.sleep(1.0)
     assert len(scripted_events) == 1, scripted_events
-    await asyncio.sleep(2.2)
+    await asyncio.sleep(3.2)
     await demo.cancel()
     said = [(getattr(e, "speaker", ""), getattr(e, "text", "")) for e in scripted_events]
     assert said[0] == ("dispatcher", "911, what's your emergency?"), said
@@ -322,27 +322,27 @@ async def _main() -> None:
     from services.voice.demo_call import DEMO_CALL as _LINES, speak_s, BEAT_S
 
     assert abs((_LINES[1][0] - _LINES[0][0]) - (speak_s(_LINES[0][2]) + BEAT_S)) < 0.02
-    # A connected scripted call must publish a real camera handoff immediately.
-    # Before this regression test, the handoff stayed in _update_q forever.
+    # A scripted handoff is a paced exchange: one concise Sentinel update,
+    # then one responder acknowledgement after a natural pause.
     scripted_events.clear()
     demo = VoiceAgent(scripted_pub, zrt=qwen)  # type: ignore[arg-type]
     await demo.start_scripted_call(rec, assemble_call_brief(rec))
     event_count = len(scripted_events)
     await demo.notify_whereabouts("cam-02", assemble_call_brief(rec).address)
-    await asyncio.sleep(1.1)
+    await asyncio.sleep(1.2)
     handoff_events = scripted_events[event_count:]
     handoff_lines = [getattr(event, "text", "") for event in handoff_events]
-    handoff_speakers = [
-        getattr(event, "speaker", "") for event in handoff_events
+    assert "They've moved into the east corridor." in handoff_lines, handoff_lines
+    assert "Copy. Keep monitoring the east corridor." not in handoff_lines
+    await asyncio.sleep(1.7)
+    handoff_events = scripted_events[event_count:]
+    handoff_lines = [getattr(event, "text", "") for event in handoff_events]
+    acknowledgements = [
+        event for event in handoff_events
+        if getattr(event, "text", "") == "Copy. Keep monitoring the east corridor."
     ]
-    assert (
-        "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor."
-        in handoff_lines
-    ), handoff_lines
-    assert "dispatcher" in handoff_speakers, handoff_events
-    assert any(
-        "keep tracking" in text.lower() for text in handoff_lines
-    ), handoff_lines
+    assert len(acknowledgements) == 1, handoff_lines
+    assert getattr(acknowledgements[0], "speaker", "") == "dispatcher"
     await demo.cancel()
     assert DURATION > _LINES[-1][0]
 

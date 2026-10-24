@@ -205,16 +205,9 @@ class VoiceAgent:
                         ts=utcnow(),
                     )
                 )
-            # The opening establishes the emergency.  The rest of the call
-            # follows the camera wall's playback clock, rather than ending on
-            # a fixed script.
-            next_check_in = int(self.clock()) + 12
-            while True:
-                await asyncio.sleep(0.5)
-                if int(self.clock()) < next_check_in:
-                    continue
-                await self._publish_scripted_check_in(incident_id)
-                next_check_in = int(self.clock()) + 20
+            # The opening establishes the emergency.  Further transcript
+            # turns are event-driven by real camera handoffs.
+            await asyncio.Event().wait()
         finally:
             self._scripted = False
             self._incident_id = None
@@ -222,60 +215,32 @@ class VoiceAgent:
                 task.cancel()
             self._scripted_reply_tasks.clear()
 
-    async def _publish_scripted_check_in(self, incident_id: str) -> None:
-        """Keep the on-screen responder conversation aligned with playback."""
-        if not self._scripted or incident_id != self._incident_id:
-            return
-        await self.publish(
-            CallTranscriptDelta(
-                incident_id=incident_id,
-                speaker="dispatcher",
-                text="Copy. Do you still have them in view?",
-                ts=utcnow(),
-            )
-        )
-        await asyncio.sleep(0.8)
-        if not self._scripted or incident_id != self._incident_id:
-            return
-        status = scene.answer("status", self.clock())
-        await self.publish(
-            CallTranscriptDelta(
-                incident_id=incident_id,
-                speaker="sentinel",
-                text=status or "I still have them in view and will report any change.",
-                ts=utcnow(),
-            )
-        )
-
-    async def _publish_scripted_handoff_reply(self, incident_id: str) -> None:
+    async def _publish_scripted_handoff_reply(
+        self, incident_id: str, camera_id: str
+    ) -> None:
         """Answer a real camera handoff with a natural responder turn."""
-        await asyncio.sleep(0.75)
+        await asyncio.sleep(2.5)
         if not self._scripted or incident_id != self._incident_id:
             return
+        area = {
+            "cam-01": "the lobby",
+            "cam-02": "the east corridor",
+            "cam-03": "the west corridor",
+        }.get(camera_id.lower(), "that area")
         await self.publish(
             CallTranscriptDelta(
                 incident_id=incident_id,
                 speaker="dispatcher",
-                text="Copy. Keep tracking the group and advise if their direction changes.",
-                ts=utcnow(),
-            )
-        )
-        await asyncio.sleep(0.8)
-        if not self._scripted or incident_id != self._incident_id:
-            return
-        status = scene.answer("status", self.clock())
-        await self.publish(
-            CallTranscriptDelta(
-                incident_id=incident_id,
-                speaker="sentinel",
-                text=status or "I still have them in view and will report any change.",
+                text=f"Copy. Keep monitoring {area}.",
                 ts=utcnow(),
             )
         )
 
-    def _schedule_scripted_handoff_reply(self, incident_id: str) -> None:
+    def _schedule_scripted_handoff_reply(
+        self, incident_id: str, camera_id: str
+    ) -> None:
         task = asyncio.create_task(
-            self._publish_scripted_handoff_reply(incident_id),
+            self._publish_scripted_handoff_reply(incident_id, camera_id),
             name=f"demo-call-reply-{incident_id}",
         )
         self._scripted_reply_tasks.add(task)
@@ -454,7 +419,7 @@ class VoiceAgent:
         else:
             await self._update_q.put((camera_id, address))
         if self._scripted and self._incident_id:
-            self._schedule_scripted_handoff_reply(self._incident_id)
+            self._schedule_scripted_handoff_reply(self._incident_id, camera_id)
 
     async def cancel(self) -> None:
         self._live = False
@@ -475,11 +440,18 @@ class VoiceAgent:
         if self._live_brief is not None:
             self._live_brief.camera_id = camera_id
             self._live_brief.address = address
+        report = scene.update_line(previous.upper(), camera_id.upper())
+        if self._scripted:
+            report = {
+                "cam-01": "They've moved into the lobby.",
+                "cam-02": "They've moved into the east corridor.",
+                "cam-03": "They've moved into the west corridor.",
+            }.get(camera_id.lower(), "They've moved to another area.")
         await self.publish(
             CallTranscriptDelta(
                 incident_id=self._incident_id or "",
                 speaker="sentinel",
-                text=scene.update_line(previous.upper(), camera_id.upper()),
+                text=report,
                 ts=utcnow(),
             )
         )

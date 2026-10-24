@@ -6,25 +6,20 @@ minute. A change of speaker adds one second of silence before the next line.
 
 from __future__ import annotations
 
-WPM = 150
-BEAT_S = 1.0
+WPM = 120
+BEAT_S = 1.8
 PLACE = "Spartan Complex"
 
 # (speaker, text). Timestamps are derived; do not hand-tune them.
 _LINES: list[tuple[str, str]] = [
     ("dispatcher", "911, what's your emergency?"),
-    ("sentinel", f"Hi, this is Sentinel AI. I'm reporting armed people inside {PLACE}."),
-    ("sentinel", f"The address is {PLACE}."),
-    ("dispatcher", "Where are you calling from?"),
-    ("sentinel", f"This is Sentinel AI, on the camera network at {PLACE}."),
-    ("sentinel", "Armed people are in the ground-floor lobby."),
-    ("sentinel", "I see handguns and a knife in the ground-floor lobby."),
+    ("sentinel", f"This is Sentinel AI, the camera system at {PLACE}. I see armed people in the ground-floor lobby."),
     ("dispatcher", "Okay, how many people do you see?"),
-    ("sentinel", "Give me a moment."),
-    ("sentinel", "Eight people in the ground-floor lobby."),
-    ("sentinel", "Six of them are armed."),
-    ("dispatcher", "Stay with them and let me know when their location changes."),
-    ("sentinel", "Understood. I'll report each camera change."),
+    ("sentinel", "Eight people are visible. Six appear armed."),
+    ("dispatcher", "What weapons can you see?"),
+    ("sentinel", "I can see handguns, a knife, and a long firearm."),
+    ("dispatcher", "Okay. Keep monitoring them and tell me if they move."),
+    ("sentinel", "Understood."),
 ]
 
 

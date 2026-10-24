@@ -8,26 +8,26 @@
 <h1 align="center">Sentinel AI</h1>
 
 <p align="center">
-  <b>Local AI that spots danger early, follows it across cameras, and gives responders the facts.</b>
+  <b>AI that watches every campus camera, calls 911 with facts it can see, and follows the threat camera to camera.</b>
 </p>
 
 <p align="center">
-  <img alt="Built at Edge AI SJSUHack 2026" src="https://img.shields.io/badge/Built%20at-Edge%20AI%20SJSUHack%202026-0F5BA8?style=for-the-badge">
-  <img alt="Track: Local Agentic Systems" src="https://img.shields.io/badge/Track-Local%20Agentic%20Systems-5AA9FF?style=for-the-badge">
+  <img alt="SpartHill Hacks 2026" src="https://img.shields.io/badge/SpartHill%20Hacks-2026-0F62FE?style=for-the-badge">
+  <img alt="IBM Granite Guardian" src="https://img.shields.io/badge/IBM-Granite%20Guardian-0F62FE?style=for-the-badge&logo=ibm&logoColor=white">
+  <img alt="IBM BeeAI" src="https://img.shields.io/badge/IBM-BeeAI-0F62FE?style=for-the-badge&logo=ibm&logoColor=white">
   <br>
-  <img alt="Video analysis runs on campus" src="https://img.shields.io/badge/Video%20analysis-on%20campus-55C295?style=flat-square">
-  <img alt="Camera footage never leaves campus" src="https://img.shields.io/badge/Camera%20footage-never%20leaves%20campus-55C295?style=flat-square">
-  <img alt="Call voice by ElevenLabs (cloud)" src="https://img.shields.io/badge/Call%20voice-ElevenLabs%20(cloud)-000000?style=flat-square&logo=elevenlabs&logoColor=white">
-  <img alt="Runs on local workstation" src="https://img.shields.io/badge/Runs%20on-Local%20Workstation-0F5BA8?style=flat-square">
+  <img alt="IBM watsonx" src="https://img.shields.io/badge/IBM-watsonx-0F62FE?style=flat-square&logo=ibm&logoColor=white">
+  <img alt="Camera footage never leaves campus" src="https://img.shields.io/badge/Camera%20footage-never%20leaves%20campus-24A148?style=flat-square">
+  <img alt="Qwen3-VL runs locally" src="https://img.shields.io/badge/Qwen3--VL-runs%20locally-615CED?style=flat-square">
   <img alt="Python 3.12" src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white">
   <img alt="JavaScript, no build step" src="https://img.shields.io/badge/JavaScript-no%20build%20step-F7DF1E?style=flat-square&logo=javascript&logoColor=black">
-  <img alt="Docker Compose" src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white">
 </p>
 
 <p align="center">
-  <a href="#-watch-the-demo">Demo</a> ·
+  <a href="#-demo">Demo</a> ·
   <a href="#-the-problem">Problem</a> ·
   <a href="#-what-sentinel-ai-does">What it does</a> ·
+  <a href="#-how-ibm-fits-in">IBM</a> ·
   <a href="#-privacy-first">Privacy</a> ·
   <a href="#-a-day-with-sentinel-ai">Story</a> ·
   <a href="#-results">Results</a> ·
@@ -37,31 +37,31 @@
 
 ---
 
-## 🎬 Watch the demo
+## 🎬 Demo
+
+> 📺 **Demo video:** coming soon on our Devpost page. <!-- TODO: replace with the Devpost or YouTube link -->
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=MFF1DICU6Ow">
-    <img src="https://img.youtube.com/vi/MFF1DICU6Ow/hqdefault.jpg" alt="Watch the Sentinel AI demo on YouTube" width="640">
-  </a>
-  <br>
-  <a href="https://www.youtube.com/watch?v=MFF1DICU6Ow"><b>▶️ Watch the full demo on YouTube</b></a>
-</p>
-
-### What it looks like
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/patel-manav20/Sentinel-AI/main/docs/assets/screenshots/live-operations.png" alt="Live Operations: six camera feeds, a weapon alert on Camera 1, the campus map and the emergency call panel" width="900">
-  <br><sub><b>Live Operations.</b> Six cameras, a weapon alert on Camera 1, the campus map, and the emergency call starting on the right.</sub>
+  <img src="docs/assets/screenshots/live-operations.jpg" alt="Live Operations: a weapon alert in the ground-floor lobby, people boxed on Camera 1, the campus map, the model status panel and the live 911 call transcript" width="900">
+  <br><sub><b>Live Operations.</b> A weapon in the ground-floor lobby. Every person is boxed, the armed ones in red, and Sentinel AI is already on a 911 call (right).</sub>
 </p>
 
 <table>
   <tr>
-    <td width="50%"><img src="https://raw.githubusercontent.com/patel-manav20/Sentinel-AI/main/docs/assets/screenshots/call-console.png" alt="Call Console: live transcript of the call between Sentinel AI and the responder"></td>
-    <td width="50%"><img src="https://raw.githubusercontent.com/patel-manav20/Sentinel-AI/main/docs/assets/screenshots/site-plan-tracking.png" alt="Site plan with live tracking of the incident across cameras"></td>
+    <td width="50%"><img src="docs/assets/screenshots/camera-handoff.jpg" alt="The group moves into the east corridor on Camera 2; the tracking strip shows Cam 1 then Cam 2 and the call says they have moved"></td>
+    <td width="50%"><img src="docs/assets/screenshots/site-plan-tracking.jpg" alt="Site plan live tracking: the red path from Camera 1 to 2 to 3 across the campus map"></td>
   </tr>
   <tr>
-    <td><sub><b>Call Console.</b> Every word of the call, live, next to the incident details.</sub></td>
-    <td><sub><b>Live tracking.</b> The map shows which camera sees the person right now.</sub></td>
+    <td><sub><b>Camera to camera.</b> They move into the east corridor. The map, the tracking strip and the call all update together.</sub></td>
+    <td><sub><b>Live tracking.</b> Every handoff extends the red path, so responders know where they are and where they're going.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/assets/screenshots/call-console.jpg" alt="Call Console: full transcript of the call next to the incident details and path"></td>
+    <td width="50%"><img src="docs/assets/screenshots/system-models.jpg" alt="System page: every AI model, where it runs and its live status, including Granite Guardian on watsonx and BeeAI"></td>
+  </tr>
+  <tr>
+    <td><sub><b>Call Console.</b> Every word of the call, next to the incident and its camera path.</sub></td>
+    <td><sub><b>System.</b> Every model, where it runs, and what it's doing right now.</sub></td>
   </tr>
 </table>
 
@@ -93,22 +93,15 @@ A handful of officers can't watch hundreds of screens around the clock. So most 
 
 Sentinel AI is like **a security guard who never blinks and can watch every camera at once**.
 
-It watches every camera feed live. When something looks wrong, a powerful AI takes a closer look and decides what it is, for example a weapon, a fight, a theft, someone running, or a medical emergency. If it's serious, Sentinel AI raises an alert on the security team's screen, **follows the person from camera to camera** on a live campus map, and can **phone for help by itself**. On that call it answers the responder's questions using only facts it can see.
+<p align="center">
+  <img src="docs/assets/architecture-overview.png" alt="How Sentinel AI works: Watch, Detect and track, Understand, Check and decide with IBM Granite Guardian and IBM BeeAI, then Act. Video stays on campus; only text goes to the cloud." width="900">
+</p>
 
-The watching and the thinking happen on **one local computer on campus**. This is called *edge AI*: the AI runs right where the cameras are, not on the internet, so camera footage never has to leave the building. The only part that uses the internet is the phone call itself, including the voice Sentinel AI speaks with.
-
-```mermaid
-flowchart LR
-    subgraph CAMPUS["🏫 On campus"]
-        A["📹 Campus cameras"] --> B["🧠 Sentinel AI<br/>one small computer"]
-        B -->|"all clear"| X["🗑️ Nothing to report"]
-        B -->|"something is wrong"| C["🚨 Alert on the<br/>security screen"]
-        C --> E["👮 Security team"]
-    end
-    B -->|"only the words to say"| V["☁️ ElevenLabs<br/>online voice service"]
-    V -->|"spoken voice"| B
-    B -->|"serious danger:<br/>phone call"| D["📞 Responder's phone"]
-```
+1. **Watch.** Every camera feed, every second.
+2. **Detect and track.** YOLO finds every person, ByteTrack keeps an ID on each one, and simple rules flag weapons, falls and running.
+3. **Understand.** A local vision model (Qwen3-VL) reviews a short clip, names what's happening (weapon, fight, theft, running, medical, or nothing), and describes the people involved.
+4. **Check and decide.** For a severe weapon incident, **IBM Granite Guardian** on **IBM watsonx** checks the threat, and an **IBM BeeAI** workflow combines that verdict with hard rules to allow or block the call.
+5. **Act.** Sentinel AI raises an alert on the security console, **follows the person from camera to camera** on a live campus map, and **phones for help by itself**. On the call it answers the dispatcher's questions using only facts the cameras show, and gives live updates as they move.
 
 ---
 
@@ -118,92 +111,98 @@ flowchart LR
 |:---:|---|---|
 | 👁️ | **Watches every camera, all the time** | No feed goes unwatched, even at 3 a.m. |
 | 🧠 | **Understands what it sees** | It tells a weapon from a fight, a theft, someone running, or a medical emergency, instead of just reacting to movement. |
-| 🧭 | **Follows the person across cameras** | When someone moves from the lobby to a hallway, the alert and the map move with them. |
-| 🗺️ | **Live campus map** | Security sees exactly which camera, building and hallway at a glance. |
-| 📞 | **Calls for help by itself** | For a serious incident, it places one call and answers questions like "Exact address?" and "Where are they now?" in a natural voice. |
-| ✅ | **Facts, not guesses** | Addresses and locations come from a fixed campus camera list, never made up by the AI. If it doesn't know, it says so. |
-| 🛑 | **Humans stay in control** | Plain rules, not the AI, decide when to call. There is one call per incident, and a kill switch stops all calls. Officers can confirm, dismiss, or send a broadcast from the console. |
-| 🔒 | **Camera footage stays on campus** | The video is analyzed on campus and never uploaded. |
+| 🛡️ | **IBM-checked before it acts** | IBM Granite Guardian double-checks the threat, and an IBM BeeAI workflow decides whether a call is allowed. |
+| 🧭 | **Follows the person across cameras** | When someone moves from the lobby to a hallway, the alert, the map and the call move with them. |
+| 📞 | **Calls for help by itself** | It places one call and answers questions like "How many people?", "What weapons?" and "Where are they now?" in a natural voice. |
+| ✅ | **Facts, not guesses** | Addresses come from a fixed camera map, never from the AI. Counts and weapons come from what the camera sees at that second. If it doesn't know, it says so. |
+| 📢 | **One-click broadcast** | Officers can send a shelter-in-place message to the security team from the console. |
+| 🗂️ | **Nothing is lost** | The incident timeline, the full call transcript, and every model's activity and token use are recorded. |
+| 🛑 | **Humans stay in control** | One call per incident, an hourly cap, and a kill switch. Officers can confirm or dismiss any incident. |
+
+---
+
+## 🔷 How IBM fits in
+
+We used IBM tools where they carry weight: the moment before Sentinel AI does something outside the building.
+
+| IBM tool | Job in Sentinel AI | Where |
+|---|---|---|
+| **IBM Granite Guardian** (`ibm/granite-guardian-3-8b`) | Reads a short text summary of the incident and answers one question: *is this harmful?* An independent safety check on top of the vision model. | `services/brain/track_ai.py` |
+| **IBM watsonx** | Hosts Granite Guardian through the watsonx text-generation API (IAM token, project-scoped). Only the incident text is sent, never video. | `services/brain/track_ai.py` |
+| **IBM BeeAI** (`beeai_framework` workflow) | Combines the local rules (severity, one call per incident, hourly cap, kill switch) with Guardian's verdict, and allows or blocks the call. **If Guardian or BeeAI fails, the call is blocked, not allowed.** | `services/brain/track_ai.py` → `services/api/hub.py` |
+| **IBM Bob** | Our design partner while planning: it shaped the tiered pipeline, the calibrated-confidence approach and the safety gate. See [Use of AI](#-use-of-ai). | — |
+
+The **System** page and the model panel show Guardian and BeeAI status live. Every decision is printed to the server log as `[track] guardian … beeai …`.
 
 ---
 
 ## 🔒 Privacy first
 
-Most "smart camera" services upload your video to the cloud (someone else's computers on the internet) and analyze it there. **Sentinel AI does the opposite: it moves the computer to the video, not the video to the computer.**
+Most "smart camera" services upload your video to the cloud and analyze it there. **Sentinel AI does the opposite: it moves the computer to the video, not the video to the computer.**
 
-**What stays on campus, on the local demo workstation:**
+**What stays on campus, on one local GPU workstation:**
 - 📹 Every camera frame, and every image the AI looks at
-- 🧠 All of the AI's reasoning and every decision about what is dangerous and whether to call
-- 👂 Understanding what the responder says on the phone (speech recognition)
+- 🧠 The vision model's reasoning, the rules, and the BeeAI decision
+- 👂 Understanding what the dispatcher says on the phone (speech recognition)
 - 🗂️ The incident history
 
 **What goes over the internet, and only when there is an incident:**
-- 🗣️ **To ElevenLabs** (an online voice service): the **text** of each sentence Sentinel AI says on the call, for example *"They have moved into the east corridor."* ElevenLabs sends back the spoken audio. **No video and no images are ever sent.**
-- 📞 **To SignalWire** (the phone company service that places the call): the **phone call audio in both directions**, meaning Sentinel AI's voice and the responder's voice. If an officer sends an **SOS broadcast** from the console, its message text goes to SignalWire too, so it can be texted or read out on a call.
+- 🛡️ **To IBM watsonx:** a short **text** summary of the incident for Granite Guardian, for example *"Campus camera incident on cam-01. A person is carrying a visible weapon."* No video and no images.
+- 🗣️ **To ElevenLabs:** the **text** of each sentence Sentinel AI says on the call. ElevenLabs sends back the spoken audio.
+- 📞 **To SignalWire:** the **phone call audio** in both directions, and the text of any SOS broadcast.
 
-**What Sentinel AI never does:** it does no face recognition, keeps no identity database, and does no matching against student lists. It only describes what a person looks like, for example "adult in dark clothing".
-
-**Why this matters:**
-
-| | |
-|---|---|
-| 🔐 **Privacy** | Video of students and staff never leaves campus. Only short sentences meant to be spoken on a call go out. |
-| ⚡ **Speed** | Spotting danger needs no round trip to a faraway data center. |
-| 📉 **Less bandwidth** | The system sends a few sentences, not hours of video. |
-| 💵 **Predictable cost** | The video analysis runs on your own hardware, not a bill for every request. The call voice is the only part billed by use: ElevenLabs charges by the number of characters spoken. |
+**What Sentinel AI never does:** no face recognition, no identity database, no matching against student lists. It only describes what a person looks like, for example "a man in a red polo shirt and jeans".
 
 ---
 
 ## 📖 A day with Sentinel AI
 
-> *Our demo uses a staged "mock attack" recording played through three synchronized cameras. Calls go to a configured test number, **never to 911 or emergency services**.*
+> *Our demo uses a staged "mock attack" recording played through three synchronized cameras. In live mode, calls go to a verified teammate's phone, **never to 911 or emergency services**. The demo video uses recording mode, described [below](#what-is-live-in-the-demo-and-what-is-pre-computed).*
 
-**10:45 p.m.** Six cameras show a quiet campus. People walk through the lobby. Nothing is happening, and Sentinel AI keeps watching.
+**02:13:59.** Three cameras show a quiet building. Nothing is happening, and Sentinel AI keeps watching.
 
-**10:45:38.** A person carrying a weapon enters the **ground-floor lobby (Camera 1)**. The quick first-pass AI notices, and a short clip goes to the expert AI. The expert confirms: **Weapon, Severe.** A red alert appears on the security console.
+**02:14:00.** Armed people walk into the **ground-floor lobby (Camera 1)**. Every person gets a box, and the armed ones turn red. **Weapon, Severe.** A red alert appears on the security console, and the call starts:
 
-**10:45:39.** Plain rules check the situation. It is a verified weapon, and no call has been placed for this incident yet. So Sentinel AI **places one call**:
-
-> 🤖 *"Hi, this is Sentinel AI at the IBM Campus Sentinel demo. This is a staged demo call."*
+> 👮 *"911, what's your emergency?"*
 >
-> 👮 *"Exact address?"*
+> 🤖 *"Hi, this is Sentinel AI at San Jose State. I'm reporting armed people inside MacQuarrie Hall, One Washington Square. I see five handguns and one knife in the ground-floor lobby."*
 >
-> 🤖 *"Address on file: 1 New Orchard Road, Armonk, New York (demo-only)."*
+> 👮 *"Okay, how many people do you see?"*
+>
+> 🤖 *"Give me a moment. Eight people in the ground-floor lobby; five of them armed."*
 
-**10:46:38.** The person moves into the **east corridor (Camera 2)**. Sentinel AI follows. The map updates, and the **same call** gets an update: *"They have moved from the ground-floor lobby into the east corridor on the ground floor."*
+**02:14:52.** They move into the **east corridor (Camera 2)**. Sentinel AI follows. The map extends the red path, and the **same call** gets an update: *"Update: they have moved from the ground-floor lobby into the east corridor on the ground floor."*
 
-**Next, Camera 3.** They reach the **west corridor near the stairwell**. It is the same incident and the same call, updated live.
+**02:15:47.** They reach the **west corridor near the stairwell (Camera 3)**. Same incident, same call, updated live.
 
-**One detection. One call. Three handoffs. No human had to notice first.**
+**One detection. One call. Every handoff reported. No human had to notice first.**
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Cam as 📹 Camera 1
-    participant Eye as 👁️ Quick first look
-    participant Brain as 🧠 Expert AI
-    participant Rules as ⚖️ Safety rules
+    participant Eye as 👁️ YOLO + ByteTrack
+    participant Brain as 🧠 Qwen3-VL
+    participant GG as 🛡️ IBM Granite Guardian
+    participant Bee as 🐝 IBM BeeAI
     participant Screen as 🖥️ Security console
     participant Voice as 📞 Voice agent
-    participant EL as ☁️ ElevenLabs
-    participant Resp as 👮 Responder
+    participant Disp as 👮 Dispatcher
 
     Cam->>Eye: Live video frames
     Eye->>Eye: Finds people and follows each one
-    Eye->>Brain: Something looks wrong, sends a short clip
-    Brain->>Rules: WEAPON, with a description of the person
-    Rules->>Screen: 🚨 Severe incident alert
-    Rules->>Voice: Place ONE call for this incident
-    Voice->>EL: Words to say, as text only
-    EL-->>Voice: Spoken audio
-    Voice->>Resp: Weapon reported in IBM Demo Building A
-    Resp->>Voice: Exact address?
-    Voice->>Resp: Address on file: 1 New Orchard Road, Armonk
-    Note over Voice,EL: Every sentence Sentinel AI speaks goes through ElevenLabs as text
-    Cam-->>Eye: Person now on Camera 2
-    Eye->>Screen: Map follows the person
+    Eye->>Brain: Something looks wrong: a 16-frame clip
+    Brain->>Screen: 🚨 WEAPON, severe, with a description
+    Brain->>GG: Incident summary (text only)
+    GG->>Bee: Harmful? Yes
+    Bee->>Voice: Rules + Guardian agree: place ONE call
+    Voice->>Disp: Armed people in the ground-floor lobby
+    Disp->>Voice: How many people do you see?
+    Voice->>Disp: Eight people; five of them armed
+    Cam-->>Eye: Group now on Camera 2
+    Eye->>Screen: Map extends the path
     Screen->>Voice: Same call, location updated
-    Voice->>Resp: They moved into the east corridor
+    Voice->>Disp: They moved into the east corridor
 ```
 
 ---
@@ -214,20 +213,35 @@ These are real measurements from the local demo workstation (sample data in [`be
 
 | What we measured | Result |
 |---|---|
-| 🎥 Live camera wall with detection boxes (15 fps clip pack) | **13–14 frames per second** (up from about 3) |
+| 🎥 Live camera wall with detection boxes | **13–14 frames per second** (up from about 3) |
 | 🗣️ ElevenLabs voice: time until the first sound is ready (short line, warm connection) | **157–160 milliseconds** |
-| 👂 Voice reply, from the moment the caller stops talking to the answer audio being ready (local phone-audio test) | **0.75–1.20 seconds** <!-- TODO: confirm whether this was measured before ElevenLabs was switched on --> |
-| 🧠 Expert AI model size | **30 billion parameters**, but only about **3 billion** are used at each step. That keeps it fast on one small box. |
+| 🧠 Vision model size | **30 billion parameters**, but only about **3 billion** are active at each step. That keeps it fast on one GPU. |
 | 🎯 Weapon labels lined up with the demo video | **640 of 649** frames matched |
-| 📹 Cameras on the demo wall | **6** (3 running full AI analysis, 3 background feeds) |
 
-> **Honest note:** We have not measured detection accuracy yet. The alert thresholds are demo settings, not tuned on labelled data (see [`bench/thresholds.json`](./bench/thresholds.json)).
+> **Honest note:** we have not measured detection accuracy yet. The alert thresholds are demo settings, not tuned on labelled data (see [`bench/thresholds.json`](./bench/thresholds.json)).
 
 ---
 
 ## 👥 The team
 
-Built for **Edge AI SJSUHack 2026** by **Ayush · Pratham · Manav · Naman · Indraneel**.
+Built for **SpartHill Hacks 2026** by **Ayush · Naman · Rahil · Vraj**.
+
+---
+
+## 🤖 Use of AI
+
+**Inside the product**, each model has one job. Fast detectors screen every frame, a local vision model reasons only about escalated moments, IBM Granite Guardian gives an independent safety check, and an IBM BeeAI workflow plus plain-code guardrails decide whether to call. The model never decides alone and never supplies an address.
+
+**Building it**, we used AI coding and design tools, and we reviewed and tested everything they produced:
+
+- **IBM Bob:** our planning and design partner. In one long session it pushed back on our first ideas and changed several of them:
+  - The real problem is *alerts nobody trusts*, not detection.
+  - A tiered pipeline: a cheap first pass tuned for **recall** (false positives are cheap there), and an expensive vision model only on what it flags.
+  - **Calibrated confidence from token logprobs**, instead of asking the model to type a confidence number, plus getting the label and the description from one encoded clip.
+  - Using **Granite Guardian** and **BeeAI** as the safety gate before any outside action.
+
+  Bob argued for a human confirming every dispatch. We chose an automatic call gated by Guardian, BeeAI and hard rules, limited in this build to a verified teammate's phone.
+- **Claude Code, Codex and Cursor:** implementation, debugging and tests, plus the demo video, diagrams and documentation.
 
 ---
 
@@ -237,156 +251,144 @@ Built for **Edge AI SJSUHack 2026** by **Ayush · Pratham · Manav · Naman · I
 
 **Windows quickstart:** [`docs/WINDOWS_DEMO_SETUP.md`](./docs/WINDOWS_DEMO_SETUP.md)
 
-### Tech stack
-
-Everything here comes from the code. The repo has no `requirements.txt`, `pyproject.toml` or `package.json`, so Python packages are **not version-pinned**; versions are listed only where the code or config fixes them.
-
-#### 🎥 Video & vision
-
-| Tech | Version / model | What it does in Sentinel AI |
-|---|---|---|
-| <img alt="Ultralytics YOLO" src="https://img.shields.io/badge/Ultralytics-YOLO26s--pose-111F68?style=flat-square"> | `yolo26s-pose.pt` | Finds every person in each frame and their body pose (17 points per person). |
-| <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white"> | not pinned | Runs the YOLO and CLIP models on the GPU (or CPU). |
-| <img alt="OpenCLIP" src="https://img.shields.io/badge/OpenCLIP-ViT--B%2F16-412991?style=flat-square"> | `ViT-B-16`, `openai` weights | Scores cropped people for suspicious activity (VadCLIP-style). It is skipped while the weapon timeline is loaded. |
-| <img alt="OpenCV" src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white"> | not pinned | Reads the camera video files frame by frame. |
-| <img alt="FFmpeg" src="https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white"> | installed in the API image | Encodes frames for the live camera wall and prepares the demo clips. |
-| <img alt="NumPy" src="https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white"> <img alt="Pillow" src="https://img.shields.io/badge/Pillow-3776AB?style=flat-square"> | not pinned | Image and array handling for the models. |
-| <img alt="MediaMTX" src="https://img.shields.io/badge/MediaMTX-optional-555555?style=flat-square"> | `bluenviron/mediamtx:latest` | Optional relay for real RTSP cameras. **Not used in the demo.** |
-
-#### 🧠 AI brain
-
-| Tech | Version / model | What it does in Sentinel AI |
-|---|---|---|
-| <img alt="Local VLM runtime" src="https://img.shields.io/badge/Runtime-Local%20OpenAI%20compatible%20endpoint-0096D6?style=flat-square"> | host `zrt` on `:8000` | Serves the large AI model locally through an OpenAI-compatible API. |
-| <img alt="Qwen3-VL" src="https://img.shields.io/badge/Qwen3--VL-30B--A3B%20FP8-615CED?style=flat-square"> | `Qwen/Qwen3-VL-30B-A3B-Instruct-FP8` | Looks at a 16-frame clip, names the incident type, and describes the person. |
-| <img alt="Hugging Face" src="https://img.shields.io/badge/Hugging%20Face-model%20source-FFD21E?style=flat-square&logo=huggingface&logoColor=black"> | `hf:` model id | Where the local runtime downloads the Qwen weights (once, at setup). |
-| Plain Python | — | Fusion, severity thresholds, incident state machine and guardrails. The rules decide, not the model. |
-
-#### 🗣️ Voice & calling
-
-| Tech | Version / model | What it does in Sentinel AI |
-|---|---|---|
-| <img alt="ElevenLabs" src="https://img.shields.io/badge/ElevenLabs-000000?style=flat-square&logo=elevenlabs&logoColor=white"> | `eleven_flash_v2_5`, voice "Sarah", `ulaw_8000` | Turns each sentence Sentinel AI says into speech, streamed straight onto the phone line. It is called over HTTPS with Python's standard library, with no SDK. |
-| <img alt="SignalWire" src="https://img.shields.io/badge/SignalWire-044EF4?style=flat-square"> | Compatibility (LaML) API | Places the phone call, streams call audio both ways, and sends SOS broadcasts. |
-| <img alt="faster-whisper" src="https://img.shields.io/badge/faster--whisper-base.en%20·%20int8%20·%20CPU-4B8BBE?style=flat-square"> | `base.en`, int8, CPU | Understands what the responder says, locally on the box. |
-
-#### ⚙️ Backend & APIs
-
-| Tech | Version | What it does in Sentinel AI |
-|---|---|---|
-| <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white"> | 3.12 (API image `python:3.12-slim`) | All backend code. |
-| <img alt="asyncio" src="https://img.shields.io/badge/asyncio-HTTP%20%2B%20WebSocket-3776AB?style=flat-square&logo=python&logoColor=white"> | standard library | A small hand-written HTTP and WebSocket server, with no web framework. It serves live events, operator actions, video and phone webhooks. |
-| <img alt="SQLite" src="https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white"> | standard library | Keeps the history of runs, incidents, calls and transcripts. |
-| JSON contracts | `contracts/` | Shared, frozen message shapes for incidents, events and the call brief. |
-
-#### 🖥️ Dashboard / web
-
-| Tech | Version | What it does in Sentinel AI |
-|---|---|---|
-| <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES%20modules-F7DF1E?style=flat-square&logo=javascript&logoColor=black"> | no framework, no npm | The whole security console, as plain JavaScript modules. |
-| <img alt="HTML5" src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white"> <img alt="CSS" src="https://img.shields.io/badge/CSS-1572B6?style=flat-square&logo=css&logoColor=white"> | — | Layout and styling, with design tokens and a light/dark theme. |
-| SVG + Canvas | built into the browser | Detection boxes, the map overlay, and usage charts, with no chart library. |
-| <img alt="OpenStreetMap" src="https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white"> | static export (`web/assets/site-map.png`) | The campus map. It is a saved image, so no map tiles are loaded from the internet. |
-
-#### 🐳 Infrastructure
-
-| Tech | Version | What it does in Sentinel AI |
-|---|---|---|
-| <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"> <img alt="Docker Compose" src="https://img.shields.io/badge/Docker%20Compose-2496ED?style=flat-square&logo=docker&logoColor=white"> | `docker-compose.yml` | Packages the API service (plus optional MediaMTX). |
-| <img alt="GNU Make" src="https://img.shields.io/badge/Make-A42E2B?style=flat-square&logo=gnu&logoColor=white"> | `Makefile` | Shortcuts for running and checking the system. |
-| <img alt="NVIDIA" src="https://img.shields.io/badge/nvidia--smi-76B900?style=flat-square&logo=nvidia&logoColor=white"> | — | Reads real GPU load for the dashboard's health strip. |
-| <img alt="Bash" src="https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnubash&logoColor=white"> | `scripts/preflight_gb10.sh` | Checks GPU memory before starting the big models. |
-
-#### 💻 Hardware
-
-| Tech | What it does in Sentinel AI |
-|---|---|
-| <img alt="Demo workstation" src="https://img.shields.io/badge/Hardware-Local%20GPU%20workstation-0096D6?style=flat-square"> | The one on-campus computer that runs the vision, the AI brain, speech recognition and the console. |
-
 ### Architecture
 
-The camera loop, the brain and the voice bridge all run inside **one API process** (`python -m services.api`). The local model runtime and speech recognition run as separate local services on the same box. ElevenLabs and SignalWire are the only internet services.
+<p align="center">
+  <img src="docs/assets/architecture-technical.png" alt="Technical architecture: cameras into the vision router (decode, YOLO26s-pose, ByteTrack, rules and CLIP, escalate), the brain (Qwen3-VL, fuse and thresholds, state machine, guardrails), dispatch review with IBM Granite Guardian on watsonx and IBM BeeAI, the API hub, security console and voice agent, and cloud services IBM watsonx, ElevenLabs and SignalWire" width="100%">
+</p>
+
+The camera loop, the brain, the IBM dispatch review and the voice bridge all run inside **one API process** (`python -m services.api`). The local model runtime and speech recognition run as separate local services on the same machine. IBM watsonx, ElevenLabs and SignalWire are the only internet services.
 
 ```mermaid
 flowchart LR
-    subgraph BOX["🖥️ Local demo workstation · on campus"]
+    subgraph BOX["🖥️ Local GPU workstation · on campus"]
         CLIPS[("🎞️ Camera clips<br/>MP4, outside the repo")]
 
         subgraph APIPROC["API process · services/api · :8080"]
-            VIS["👁️ Vision router<br/>services/vision<br/>decode · YOLO26s-pose · tracker · rules"]
-            BRAIN["🧠 Brain<br/>services/brain<br/>bundle · fuse · thresholds<br/>state machine · guardrails"]
-            HUB["🔀 DemoHub<br/>WebSocket · REST · MJPEG<br/>SQLite history"]
-            VOICE["📞 Voice agent<br/>services/voice<br/>media bridge · scene facts"]
+            VIS["👁️ Vision router<br/>decode · YOLO26s-pose · ByteTrack · rules"]
+            BRAIN["🧠 Brain<br/>fuse · thresholds · state machine · guardrails"]
+            REVIEW["🛡️ Dispatch review<br/>IBM Granite Guardian → IBM BeeAI"]
+            HUB["🔀 Hub<br/>WebSocket · REST · MJPEG · SQLite"]
+            VOICE["📞 Voice agent<br/>call brief · scene facts · media bridge"]
         end
 
         ZRT["🤖 Local VLM runtime · :8000<br/>Qwen3-VL-30B-A3B FP8"]
-        ASR["🎙️ faster-whisper ASR<br/>:8091 default"]
-        WEB["🖥️ Web console · web/<br/>static files on :8090"]
+        ASR["🎙️ faster-whisper · :8091"]
+        WEB["🖥️ Security console · :8090"]
     end
 
     subgraph CLOUD["☁️ Internet services"]
-        EL["🗣️ ElevenLabs<br/>text-to-speech"]
-        SW["☎️ SignalWire<br/>phone calls"]
+        WX["🔷 IBM watsonx<br/>Granite Guardian"]
+        EL["🗣️ ElevenLabs"]
+        SW["☎️ SignalWire"]
     end
 
     CLIPS --> VIS
-    VIS -->|"escalation + 16 frames"| BRAIN
+    VIS -->|"16-frame clip"| BRAIN
     BRAIN <-->|"classify + describe"| ZRT
+    BRAIN -->|"severe weapon"| REVIEW
+    REVIEW <-->|"incident text → yes / no"| WX
+    REVIEW -->|"allowed: start call"| VOICE
     BRAIN --> HUB
     VIS -->|"boxes + handoffs"| HUB
-    HUB -->|"/ws events · /mjpeg · /media"| WEB
-    HUB -->|"dispatch · call brief"| VOICE
-    VOICE <-->|"responder audio in, text out"| ASR
-    VOICE -->|"text of each spoken line only"| EL
-    EL -->|"voice audio"| VOICE
+    HUB <-->|"events · video · actions"| WEB
+    VOICE <--> ASR
+    VOICE -->|"line text"| EL
+    EL -->|"audio"| VOICE
     VOICE <-->|"call audio"| SW
-    HUB -->|"SOS broadcast text"| SW
-    SW <--> PHONE["👮 Teammate's phone<br/>never 911"]
+    SW <--> PHONE["👮 Dispatcher / teammate phone"]
 ```
 
 <details>
-<summary><b>How a frame becomes a phone call (the four stages)</b></summary>
+<summary><b>How a frame becomes a phone call (the five stages)</b></summary>
 
-1. **Screen.** Every frame on cameras 1–3 goes through YOLO26s-pose. A tracker (IoU on a constant-velocity prediction) gives each person a stable ID, and temporal rules (weapon, fall, run, sudden acceleration, long dwell) score what they're doing. Almost everything stops here at near-zero cost.
+1. **Screen.** Every frame on cameras 1–3 goes through YOLO26s-pose. ByteTrack gives each person a stable ID and a direction of travel, and temporal rules (weapon, fall, run, sudden acceleration, long dwell) score what they're doing. Almost everything stops here at near-zero cost.
 2. **Escalate.** When the fused score crosses the threshold, the router hands a 16-frame, peak-weighted evidence bundle to the brain.
-3. **Judge.** Qwen3-VL (through the local runtime endpoint) classifies the clip into one of `WEAPON | FIGHT | THEFT | RUN | MEDICAL | BENIGN` using token logprobs (Completion A), and writes a short person description (Completion B).
-4. **Decide.** Plain code, not the model, sets severity (`bench/thresholds.json`: minor ≥ 0.55, severe ≥ 0.80), moves the incident through its states (`NEW → ALERTED → DISPATCH_PENDING → DISPATCHED → TRACKING → RESOLVED`, or `DISMISSED`), and applies guardrails: one dispatch per incident, an hourly cap (`CS_DISPATCH_HOURLY_CAP`, default 6), and a kill switch (`CS_KILL_SWITCH`). The address and location on the call come from `data/camera_map.json`, never from the model.
+3. **Judge.** Qwen3-VL (through the local runtime) classifies the clip into one of `WEAPON | FIGHT | THEFT | RUN | MEDICAL | BENIGN` using token logprobs (Completion A), and writes a short person description (Completion B).
+4. **Decide.** Plain code sets severity (`bench/thresholds.json`: minor ≥ 0.55, severe ≥ 0.80), moves the incident through its states (`NEW → ALERTED → DISPATCH_PENDING → DISPATCHED → TRACKING → RESOLVED`, or `DISMISSED`), and applies guardrails: one dispatch per incident, an hourly cap (`CS_DISPATCH_HOURLY_CAP`, default 6) and a kill switch (`CS_KILL_SWITCH`).
+5. **Review (IBM).** For a severe weapon incident, `track_ai.review_dispatch` sends a text summary to **Granite Guardian on watsonx**, then runs a **BeeAI** workflow that combines the local decision with Guardian's verdict. Only an *allow* places the call. The address and location on the call come from `data/camera_map.json`, never from the model.
 
 </details>
 
 <details>
 <summary><b>How the call voice works</b></summary>
 
-- Every line Sentinel AI speaks is a `call.transcript_delta` event. The media bridge sends **only that line's text** (plus the model id and voice settings) to `api.elevenlabs.io/v1/text-to-speech/<voice>/stream` over one keep-alive HTTPS connection per call (`services/voice/elevenlabs.py`, Python standard library, no SDK).
-- ElevenLabs returns `ulaw_8000` audio, which is SignalWire's phone codec, so the chunks go straight onto the call as they arrive.
-- If no first chunk arrives within `CS_ELEVENLABS_FIRST_CHUNK_S` (default 1.5 s), or the request fails, that one line is spoken by a **local backup voice** instead (never both). A bad key or quota error pauses ElevenLabs for 10 minutes.
-- Short repeated lines (fillers, "could you repeat that") are cached so they are billed once. The ElevenLabs free tier is 10,000 characters per month.
-- `GET /voice/status` shows which voice provider is active. It never shows the key.
+- Every line Sentinel AI speaks is a `call.transcript_delta` event. The media bridge sends **only that line's text** to ElevenLabs (`eleven_flash_v2_5`) over one keep-alive HTTPS connection per call (`services/voice/elevenlabs.py`, Python standard library, no SDK).
+- ElevenLabs returns `ulaw_8000` audio, SignalWire's phone codec, so chunks go straight onto the call as they arrive.
+- If no first chunk arrives within `CS_ELEVENLABS_FIRST_CHUNK_S` (default 1.5 s), or the request fails, that one line is spoken by a **local backup voice** instead.
+- The dispatcher's speech is transcribed locally by faster-whisper. Common questions are answered instantly from `services/voice/scene.py`, which reads the people, weapons and place at the current clip second.
 
 </details>
 
-<details>
+<details id="what-is-live-in-the-demo-and-what-is-pre-computed">
 <summary><b>What is live in the demo, and what is pre-computed</b></summary>
 
-- **Live:** person detection, tracking, camera handoffs, escalation, Qwen incident classification, the dashboard, and the phone call.
-- **Pre-computed:** weapon *boxes*. Small handguns in 960×540 footage were not detected reliably live, whether by per-person CLIP, YOLOE open-vocabulary or per-crop Qwen. So `data/feeds/seville_weapon_timeline.json` replays the dataset's hand-drawn weapon boxes by clip time, and the armed person's box turns red.
-- **Shared result:** Qwen runs once on Camera 1, and Cameras 2 and 3 reuse that result.
-- **Background feeds:** Cameras 4–6 are ambient feeds and never enter YOLO or Qwen.
-- **Recording mode:** for the video recording, `CS_CALL_MODE=scripted` plays a pre-written call keyed to the clip time (see `services/voice/demo_call.py`). Real calls answer common questions instantly from `services/voice/scene.py`.
+- **Live:** person detection, tracking, camera handoffs, escalation, Qwen incident classification, the dashboard, and (in live mode) the IBM dispatch review and the phone call.
+- **Pre-computed:** weapon *boxes*. Small handguns in 960×540 footage were not detected reliably live, so `data/feeds/seville_weapon_timeline.json` replays the dataset's hand-drawn weapon boxes by clip time, and the armed person's box turns red.
+- **Recording mode:** for the demo video, `CS_CALL_MODE=scripted` plays the on-screen 911 conversation from `services/voice/demo_call.py`. The opening follows a recorded call, Sentinel's counts and weapons are read from the scene at that second, and each "they have moved" update lands on the camera handoff. **Recording mode never dials and skips the Guardian/BeeAI review.**
+- **Not yet trained:** cross-camera re-identification is a stub (`services/vision/osnet.py`). Handoffs use camera timing and an appearance hash.
 
 </details>
+
+### Tech stack
+
+#### 🔷 IBM
+
+| Tech | Model / version | What it does in Sentinel AI |
+|---|---|---|
+| <img alt="IBM Granite Guardian" src="https://img.shields.io/badge/IBM-Granite%20Guardian-0F62FE?style=flat-square&logo=ibm&logoColor=white"> | `ibm/granite-guardian-3-8b` (falls back through the 3-2b models the project lists) | Harm check on the incident text before any call. |
+| <img alt="IBM watsonx" src="https://img.shields.io/badge/IBM-watsonx.ai-0F62FE?style=flat-square&logo=ibm&logoColor=white"> | text-generation API `2024-05-31` | Hosts Granite Guardian. Called with Python's standard library. |
+| <img alt="IBM BeeAI" src="https://img.shields.io/badge/IBM-BeeAI%20framework-0F62FE?style=flat-square&logo=ibm&logoColor=white"> | `beeai_framework` workflow | The dispatch decision: local rules + Guardian verdict → allow or block. |
+
+#### 🎥 Video & vision
+
+| Tech | Version / model | What it does in Sentinel AI |
+|---|---|---|
+| <img alt="Ultralytics YOLO" src="https://img.shields.io/badge/Ultralytics-YOLO26s--pose-111F68?style=flat-square"> | `yolo26s-pose.pt` | Finds every person in each frame and their body pose (17 points per person). |
+| ByteTrack | `services/vision/tracker.py` | Stable IDs, direction of travel, and camera-to-camera handoff. |
+| <img alt="OpenCLIP" src="https://img.shields.io/badge/OpenCLIP-ViT--B%2F16-412991?style=flat-square"> | `ViT-B-16`, `openai` weights | Scores cropped people for unusual activity (VadCLIP-style). |
+| <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white"> | not pinned | Runs YOLO and CLIP on the GPU (or CPU). |
+| <img alt="OpenCV" src="https://img.shields.io/badge/OpenCV-5C3EE8?style=flat-square&logo=opencv&logoColor=white"> <img alt="FFmpeg" src="https://img.shields.io/badge/FFmpeg-007808?style=flat-square&logo=ffmpeg&logoColor=white"> | not pinned | Reads camera video and encodes frames for the live wall. |
+| <img alt="MediaMTX" src="https://img.shields.io/badge/MediaMTX-optional-555555?style=flat-square"> | `bluenviron/mediamtx:latest` | Optional relay for real RTSP cameras. **Not used in the demo.** |
+
+#### 🧠 Reasoning
+
+| Tech | Version / model | What it does in Sentinel AI |
+|---|---|---|
+| <img alt="Qwen3-VL" src="https://img.shields.io/badge/Qwen3--VL-30B--A3B%20FP8-615CED?style=flat-square"> | `Qwen/Qwen3-VL-30B-A3B-Instruct-FP8` | Looks at a 16-frame clip, names the incident type by logprobs, and describes the person. |
+| Local VLM runtime | OpenAI-compatible endpoint on `:8000` | Serves Qwen on the workstation. Weights are downloaded once at setup. |
+| Plain Python | — | Fusion, severity thresholds, incident state machine and guardrails. The rules decide, not the model. |
+
+#### 🗣️ Voice & calling
+
+| Tech | Version / model | What it does in Sentinel AI |
+|---|---|---|
+| <img alt="ElevenLabs" src="https://img.shields.io/badge/ElevenLabs-000000?style=flat-square&logo=elevenlabs&logoColor=white"> | `eleven_flash_v2_5`, `ulaw_8000` | Speaks each line on the call, streamed straight onto the phone line. |
+| <img alt="SignalWire" src="https://img.shields.io/badge/SignalWire-044EF4?style=flat-square"> | Compatibility (LaML) API | Places the call, streams call audio both ways, and sends SOS broadcasts. |
+| <img alt="faster-whisper" src="https://img.shields.io/badge/faster--whisper-base.en%20·%20int8%20·%20CPU-4B8BBE?style=flat-square"> | `base.en`, int8, CPU | Understands what the dispatcher says, locally. |
+
+#### ⚙️ Backend, web & infrastructure
+
+| Tech | Version | What it does in Sentinel AI |
+|---|---|---|
+| <img alt="Python" src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white"> | 3.12 | All backend code: a hand-written asyncio HTTP + WebSocket server, no web framework. |
+| <img alt="SQLite" src="https://img.shields.io/badge/SQLite-003B57?style=flat-square&logo=sqlite&logoColor=white"> | standard library | History of runs, incidents, calls and transcripts. |
+| <img alt="JavaScript" src="https://img.shields.io/badge/JavaScript-ES%20modules-F7DF1E?style=flat-square&logo=javascript&logoColor=black"> | no framework, no npm | The whole security console, as plain JavaScript modules with SVG and Canvas. |
+| <img alt="OpenStreetMap" src="https://img.shields.io/badge/OpenStreetMap-7EBC6F?style=flat-square&logo=openstreetmap&logoColor=white"> | static export | The campus map, saved as an image (no map tiles loaded live). |
+| <img alt="Docker" src="https://img.shields.io/badge/Docker%20Compose-2496ED?style=flat-square&logo=docker&logoColor=white"> <img alt="GNU Make" src="https://img.shields.io/badge/Make-A42E2B?style=flat-square&logo=gnu&logoColor=white"> | `docker-compose.yml`, `Makefile` | Packaging and shortcuts. |
+| JSON contracts | `contracts/` | Shared, frozen message shapes for incidents, events and the call brief. |
 
 ### Services and ports
 
 | Service | What it does | Port / address | Where it runs |
 |---|---|---|---|
-| **api** | WebSocket hub, REST actions, MJPEG and MP4 streams, SQLite history. It also hosts the vision loop, the brain and the voice bridge. | `8080` | `make api`, or the Docker Compose `api` service |
-| **Local VLM runtime** | Serves Qwen3-VL-30B-A3B FP8 (OpenAI-compatible) | `8000` | On the host (`zrt serve`), never in Compose |
+| **api** | WebSocket hub, REST actions, MJPEG and MP4 streams, SQLite history. Also hosts vision, the brain, the IBM dispatch review and the voice bridge. | `8080` | `make api`, or the Docker Compose `api` service |
+| **Local VLM runtime** | Serves Qwen3-VL-30B-A3B FP8 (OpenAI-compatible) | `8000` | On the host (`zrt serve`) |
 | **web** | Security console (static files) | `8090` | `python3 -m http.server 8090 --directory web` |
-| **ASR** | faster-whisper speech-to-text, `POST /transcribe` | `8091` (script default) | `scripts/serve_parakeet.py` (the name is historical) |
+| **ASR** | faster-whisper speech-to-text, `POST /transcribe` | `8091` | `scripts/serve_parakeet.py` (the name is historical) |
+| **IBM watsonx** ☁️ | Granite Guardian text generation | your watsonx region URL | Cloud. Needs `WATSONX_URL`, `WATSONX_PROJECT_ID` and `WATSONX_APIKEY`. |
 | **ElevenLabs** ☁️ | Text-to-speech for every call line | `https://api.elevenlabs.io` | Cloud. Needs `CS_TTS_PROVIDER=elevenlabs` and `ELEVENLABS_API_KEY`. |
-| **SignalWire** ☁️ | Outbound call, call audio stream, SOS broadcasts | your SignalWire space | Cloud. Calls back to `/signalwire/*` on the API through `CS_PUBLIC_BASE`. |
-| **mediamtx** *(optional)* | RTSP relay for real cameras. Not used by the demo. | `8554` | `docker compose --profile full up mediamtx` |
+| **SignalWire** ☁️ | Outbound call, call audio stream, SOS broadcasts | your SignalWire space | Cloud. Calls back to `/signalwire/*` through `CS_PUBLIC_BASE`. |
 
 <details>
 <summary><b>API routes</b></summary>
@@ -401,7 +403,7 @@ flowchart LR
 | `GET /voice/status` | Voice readiness (never returns secrets) |
 | `POST /signalwire/voice`, `GET /signalwire/media`, `POST /signalwire/sos` | Phone call webhooks and audio stream |
 | `GET /mjpeg/{cam}` | Live frames for cameras 1–3 (the exact frames the vision loop saw) |
-| `GET /media/{cam}` | Byte-range MP4 for ambient cameras 4–6 |
+| `GET /media/{cam}` | Byte-range MP4 for ambient cameras |
 
 </details>
 
@@ -411,42 +413,47 @@ flowchart LR
 .
 ├── contracts/          Shared data shapes: incidents, WebSocket events, call brief (frozen)
 ├── services/
-│   ├── api/            HTTP + WebSocket server, DemoHub, video streams, history DB, vision bridge
-│   ├── brain/          Qwen client (via local runtime), fusion, thresholds, state machine, guardrails, call brief
-│   ├── vision/         Video decode, YOLO26s-pose, tracker, motion rules, CLIP scorer, weapon timeline
-│   ├── voice/          SignalWire bridge, media bridge, ElevenLabs client, call agent, scene facts
-│   ├── mediamtx/       Optional RTSP relay config (not used in the demo)
-│   └── activity.py     Model activity + token usage counters shown on the dashboard (with usage.py)
+│   ├── api/            HTTP + WebSocket server, hub, video streams, history DB, vision bridge
+│   ├── brain/          Qwen client, fusion, thresholds, state machine, guardrails,
+│   │                   IBM dispatch review (track_ai.py: Granite Guardian + BeeAI)
+│   ├── vision/         Video decode, YOLO26s-pose, ByteTrack, motion rules, CLIP scorer, weapon timeline
+│   ├── voice/          SignalWire bridge, media bridge, ElevenLabs client, call agent, scene facts, demo call
+│   └── mediamtx/       Optional RTSP relay config (not used in the demo)
 ├── web/                Security console: plain HTML/CSS/JS, no build step (see web/README.md)
-├── data/               Camera map, demo scenario, feed manifests, scene script, weapon timeline
-├── scripts/            Timeline builders, speech servers, GB10 preflight, perf probe, calibration fit
+├── data/               Camera map, feed manifests, scene script, weapon timeline
+├── scripts/            Timeline builders, speech servers, GPU memory preflight, perf probe, calibration fit
 ├── bench/              Severity thresholds and the latest performance sample
-├── docs/               Stability notes, open ML items, clip notes, design docs, README assets
+├── docs/               Setup and stability notes, design docs, README images
 ├── docker-compose.yml  One machine, one compose file
-├── Makefile            Shortcuts: api, check, up, demo, reset
-└── .env.example        Settings template. Copy to .env on the box and never commit it.
+├── Makefile            Shortcuts: api, check, up, demo
+└── .env.example        Settings template. Copy to .env on the machine and never commit it.
 ```
 
 ### Prerequisites
 
-- **For the full live system:** a Linux + NVIDIA GPU machine with `zrt` installed
-- **Python 3.12** and **Docker + Docker Compose** (for `make up`). ffmpeg is not required to play the three demo MP4s.
-- YOLO and CLIP weights in `services/vision/weights/` (fetched by `services/vision/pull_weights.py`, never committed)
-- The demo camera clips, which live **outside the repo** (see below)
-- **ElevenLabs is optional and off by default.** Set `CS_TTS_PROVIDER=elevenlabs` only when you want that voice.
-- **SignalWire is optional and off by default.** Real calls and SMS require `CS_SIGNALWIRE_ENABLED=1`, and then only the verified demo handset. Do not put that number in the README.
+- **Python 3.12.** Docker + Docker Compose only if you use `make up`.
+- **For the full live system:** a Linux machine with an NVIDIA GPU and the local model runtime (`zrt`).
+- YOLO and CLIP weights in `services/vision/weights/` (fetched by `services/vision/pull_weights.py`, never committed).
+- The demo camera clips, which live **outside the repo** (see below).
+- **IBM dispatch review (optional):** an IBM watsonx project with access to Granite Guardian, plus `pip install beeai-framework`. Without the three `WATSONX_*` settings the review is skipped.
+- **ElevenLabs and SignalWire are optional and off by default.** Real calls and SMS need `CS_SIGNALWIRE_ENABLED=1`, and only ever go to the one verified number in `SIGNALWIRE_TO_NUMBER`.
 
 ### Set up your `.env`
 
-Copy the template and fill it in on the box. **Never commit `.env`.**
+Copy the template and fill it in on the machine. **Never commit `.env`.**
 
 ```bash
 cp .env.example .env
 ```
 
-Leave `CS_SIGNALWIRE_ENABLED=0` unless you are intentionally placing a call or SMS.
-Copy names from [`.env.example`](./.env.example). Do not put keys or phone numbers in this file.
-
+| Setting | What it's for |
+|---|---|
+| `WATSONX_URL`, `WATSONX_PROJECT_ID`, `WATSONX_APIKEY` | IBM Granite Guardian on watsonx. All three are required for the review. |
+| `CS_CALL_MODE` | `live` places a real call (to the verified number only). Anything else, including unset, is recording mode: the on-screen call, no dialing. |
+| `CS_TTS_PROVIDER`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | The call voice. |
+| `CS_SIGNALWIRE_ENABLED`, `SIGNALWIRE_*` | Phone calls and SMS. Leave `CS_SIGNALWIRE_ENABLED=0` unless you mean to call. |
+| `CS_KILL_SWITCH` | `1` stops every outbound call. |
+| `CS_MEDIA_ROOT` | Folder holding the three demo MP4s. |
 
 ### Run it
 
@@ -463,31 +470,27 @@ python3 -m http.server 8090 --bind 127.0.0.1 --directory web
 # open http://127.0.0.1:8090/?ws=ws://127.0.0.1:8080/ws
 ```
 
-Windows commands are in [`docs/WINDOWS_DEMO_SETUP.md`](./docs/WINDOWS_DEMO_SETUP.md). The console without `?ws=` is an older offline mock, not these three feeds.
-
+Windows commands are in [`docs/WINDOWS_DEMO_SETUP.md`](./docs/WINDOWS_DEMO_SETUP.md).
 
 **Make targets:**
 
 ```bash
 make help    # list the targets
-make check   # self-checks for brain, api, voice and OSNet
+make check   # self-checks for brain, api, voice and re-id
 make api     # run the API on 127.0.0.1:8080 (no Docker)
 make up      # docker compose up --build api
 make demo    # prints the steps to start the API and the console
-make reset   # prints how to reset; use the dashboard's Reset button or send {"cmd":"reset"} over the WebSocket
 ```
 
-> `make demo` and `make reset` only print instructions for now, and `make bench` is not wired yet. The Compose `api` image contains `contracts/`, `services/brain/` and `services/api/` only. The full live stack (vision on the GPU plus Qwen) runs as host processes.
-
 <details>
-<summary><b>Full live stack on the local demo workstation</b></summary>
+<summary><b>Full live stack on the GPU workstation</b></summary>
 
-Read [`docs/STABILITY.md`](./docs/STABILITY.md) first. Running Qwen and CUDA YOLO together can exhaust the GB10's unified memory and hard-lock the box.
+Read [`docs/STABILITY.md`](./docs/STABILITY.md) first. Running Qwen and CUDA YOLO together can run the GPU out of memory.
 
 ```bash
-bash scripts/preflight_gb10.sh
+bash scripts/preflight_gb10.sh   # GPU memory check before starting the big models
 
-# 1. Qwen through the local runtime endpoint (keep the GPU fraction at 0.40 so YOLO fits)
+# 1. Qwen through the local runtime (keep the GPU fraction at 0.40 so YOLO fits)
 zrt serve hf:Qwen/Qwen3-VL-30B-A3B-Instruct-FP8 --force --gpu-memory-fraction 0.40 \
   --extra "--max-model-len=8192"
 
@@ -502,59 +505,42 @@ python3 -m http.server 8090 --bind 127.0.0.1 --directory web
 # open http://127.0.0.1:8090/?ws=ws://127.0.0.1:8080/ws   (add &nosplash=1 to skip the intro)
 ```
 
-More settings (`CS_CALL_MODE`, `CS_MEDIA_ROOT`, `CS_DB_PATH`, and others) are documented in [`.env.example`](./.env.example).
-
 </details>
 
 ### Video feeds and model weights live outside the repo
 
-Video files and model weights are **never committed**. The demo clips live next to the repo:
+Video files and model weights are **never committed**. Put the three demo MP4s in a folder next to the repo:
 
-| What | Path |
-|------|------------|
-| **Locked 3-camera demo (stream from here)** | `.../campus_sentinel_media/feeds/final_demo_3cam_reconstructed/` |
-| Ambient clips for cameras 4–6 | Not required for the lean demo runtime |
-| Path map + FileSource example (in repo) | [`data/feeds/seville_option1_3cam_locked.json`](./data/feeds/seville_option1_3cam_locked.json) |
-| Camera IDs and locations (in repo) | [`data/camera_map.json`](./data/camera_map.json) |
-| Research originals (tmp, do not stream) | `/home/hp25/tmp/campus_sentinel_clip_research/` |
-
-- **Windows path:** `C:\Users\<you>\Documents\campus_sentinel_media\feeds\final_demo_3cam_reconstructed`
-- **Override:** `CS_MEDIA_ROOT` points the API at a different clip folder
-- **Model weights:** stay in `services/vision/weights/` (gitignored). Qwen is pulled and cached by the local runtime.
-
-Preview the clips on their own (from the media root):
-
-```bash
-cd /home/hp25/Documents/campus_sentinel_media/feeds/final_demo_3cam_reconstructed
-python3 -m http.server 8765 --bind 127.0.0.1
-# → http://127.0.0.1:8765/dashboard.html
+```text
+<repo parent>/campus_sentinel_media/feeds/final_demo_3cam_reconstructed/
+├── CAM01_lobby_entrance_IN_then_OUT_339s.mp4
+├── CAM02_hallway_east_IN_then_OUT_339s.mp4
+└── CAM03_hallway_west_IN_then_OUT_339s.mp4
 ```
+
+- **Override:** `CS_MEDIA_ROOT` points the API at a different folder.
+- **In the repo:** the path map ([`data/feeds/seville_option1_3cam_locked.json`](./data/feeds/seville_option1_3cam_locked.json)) and camera IDs and locations ([`data/camera_map.json`](./data/camera_map.json)).
+- **Model weights** stay in `services/vision/weights/` (gitignored). Qwen is pulled and cached by the local runtime.
 
 ---
 
 ## 🤝 Contributing
 
-1. **Read first:** the [For developers](#%EF%B8%8F-for-developers) section above and [`docs/STABILITY.md`](./docs/STABILITY.md) before running anything on the GB10.
+1. **Read first:** the [For developers](#%EF%B8%8F-for-developers) section and [`docs/STABILITY.md`](./docs/STABILITY.md).
 2. **Contracts are shared:** changes to `contracts/` need the whole team's agreement.
-3. **Branch:** `feat/<name>/<thing>`, and merge the same day.
-4. **Sync:** run `git pull --rebase origin main` before every push.
-5. **Never commit** model weights, video clips, API keys, or `.env`. Mock CCTV MP4s belong only under `Documents/campus_sentinel_media/`, next to this repo and never inside it.
+3. **Sync:** run `git pull --rebase origin main` before every push.
+4. **Never commit** model weights, video clips, API keys, phone numbers or `.env`.
 
 ---
 
 ## 🙏 Acknowledgments
 
-<p align="center">
-  <sub>Built as an independent staged demonstration. Not an official IBM product.</sub>
-</p>
-
-- **Edge AI SJSUHack 2026** and San José State University, for the challenge and the campus that inspired it
-- **Runtime and hardware partners**, for making local AI demos practical
-- **NVIDIA**, for local GPU acceleration
+- **SpartHill Hacks 2026** and **IBM**, for the challenge
+- **IBM** for Granite Guardian, watsonx, BeeAI and Bob
 - **Qwen team**, for Qwen3-VL
-- **Ultralytics** (YOLO), **OpenCLIP** and **faster-whisper**, the open-source models that power the pipeline
+- **Ultralytics** (YOLO), **ByteTrack**, **OpenCLIP** and **faster-whisper**, the open-source models that power the pipeline
 - **ElevenLabs**, for the call voice, and **SignalWire**, for phone calling
 - **OpenStreetMap contributors**, for the campus map
-- The authors of the **mock attack CCTV dataset** used for our demo footage <!-- TODO: confirm dataset name, authors and license (University of Seville "US Mock Attack" dataset?) -->
+- The authors of the **US Mock Attack** CCTV dataset (University of Seville), used for our demo footage <!-- TODO: confirm dataset citation and license -->
 
-<p align="center"><sub>Sentinel AI · local AI that watches, reasons and responds · IBM-focused demo build</sub></p>
+<p align="center"><sub>Sentinel AI · built for SpartHill Hacks 2026 · an independent student project, not an official IBM product</sub></p>

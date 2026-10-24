@@ -21,7 +21,7 @@ import { clear, el, setText } from "../dom.js?v=pro9";
 import { icon } from "../icons.js?v=pro9";
 import { subscribeTick } from "../clock.js?v=pro9";
 import { callElapsedMs, formatCallTimer } from "./call.js?v=pro9";
-import { phoneCallsLive } from "../modelStatus.js?v=pro9";
+import { phoneCallsLive } from "../modelStatus.js?v=pro11";
 
 export const OP_REPORT_EVENT = "sentinel:op-report";
 export const OP_CALL_EVENT = "sentinel:op-call";
@@ -120,20 +120,6 @@ export function operatorActions(inc, actions, { broadcast = true, call = true } 
     });
     setText(st, dispatchedText(inc, storeRef?.getState() || { incidents: {} }, undefined));
     row.appendChild(st);
-  } else {
-    const pending = dispatchSt?.state === "pending";
-    const c = opButton({
-      className: `btn op-btn op-btn--call op-btn--${inc.severity === "SEVERE" ? "severe" : "minor"}`,
-      iconName: "phone",
-      text: pending ? "Calling…" : "Call for help",
-      attrs: { "data-focus-key": "call" },
-      onClick: () =>
-        document.dispatchEvent(
-          new CustomEvent(OP_CALL_EVENT, { detail: { incidentId: inc.incident_id } }),
-        ),
-    });
-    c.disabled = pending;
-    row.appendChild(c);
   }
 
   let noteText = "";
@@ -170,20 +156,6 @@ export function actionBar(inc, actions, { review = true, card = true } = {}) {
     setText(text, dispatchedText(inc, storeRef?.getState() || { incidents: {} }, undefined));
     st.appendChild(text);
     bar.appendChild(st);
-  } else {
-    const pending = dispatchSt?.state === "pending";
-    const call = opButton({
-      className: `btn op-btn op-btn--call op-bar__primary op-btn--${inc.severity === "SEVERE" ? "severe" : "minor"}`,
-      iconName: "phone",
-      text: pending ? "Calling…" : "Call for help",
-      attrs: { "data-focus-key": "call" },
-      onClick: () =>
-        document.dispatchEvent(
-          new CustomEvent(OP_CALL_EVENT, { detail: { incidentId: inc.incident_id } }),
-        ),
-    });
-    call.disabled = pending;
-    bar.appendChild(call);
   }
 
   let noteText = "";
@@ -499,7 +471,7 @@ export function mountOperator(root, store, actions) {
     body.appendChild(
       el("p", {
         className: "dismiss__lead",
-        text: "Starts a simulated dispatch call. No emergency number is dialed.",
+        text: "Places the 911 call for this incident.",
       }),
     );
     if (inc.severity !== "SEVERE") {
@@ -566,7 +538,7 @@ export function mountOperator(root, store, actions) {
 
     let audience = ["everyone"];
 
-    body.appendChild(el("h3", { className: "op-label", text: "Simulated audience" }));
+    body.appendChild(el("h3", { className: "op-label", text: "Audience" }));
     const audRow = el("div", {
       className: "op-chips",
       attrs: { role: "group", "aria-label": "Audience" },
@@ -651,7 +623,7 @@ export function mountOperator(root, store, actions) {
     function paint() {
       const text = box.value.trim();
       setText(counter, `${box.value.length}/${BROADCAST_MAX}`);
-      setText(preview, `Simulated only. Nobody is notified. ${text || "…"}`);
+      setText(preview, text || "…");
       sendBtn.disabled = sending || done || !text;
       setText(sendBtn.querySelector("span"), sending ? "Sending…" : "Send broadcast");
     }
@@ -670,7 +642,7 @@ export function mountOperator(root, store, actions) {
         setText(
           result,
           res.ok
-            ? "Staged broadcast recorded. No audience was notified."
+            ? "Broadcast recorded."
             : "Saved to the incident timeline. Pending server confirmation.",
         );
         result.hidden = false;

@@ -33,10 +33,10 @@ export const BROADCAST_MAX = 280;
 
 export function broadcastPresets(cameraId) {
   return [
-    "Staged notice: shelter in place is simulated.",
-    `Staged notice: avoid the area near ${cameraLabel(cameraId)}.`,
-    "Staged notice: this is not a live alert.",
-    "Staged notice: all clear is simulated.",
+    "Shelter in place until further notice.",
+    `Avoid the area near ${cameraLabel(cameraId)}. Security is responding.`,
+    "Follow staff instructions.",
+    "All clear. Normal activity may resume.",
   ];
 }
 
@@ -357,7 +357,7 @@ export function createActions({ store, getMode, transport }) {
     if (opStatus.get(key)?.state === "pending") return { ok: false, pending: true };
     const text = String(message || "").trim();
     if (!text || !audience?.length) return { ok: false };
-    const note = `Staged broadcast recorded (nobody notified): ${text}`;
+    const note = `Broadcast recorded: ${text}`;
 
     if (!isLive()) {
       if (incidentId) appendNote(incidentId, note);

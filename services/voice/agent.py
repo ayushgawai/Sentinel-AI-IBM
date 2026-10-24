@@ -126,6 +126,7 @@ class VoiceAgent:
         self._zrt = zrt or ZRTClient()
         self._task: asyncio.Task[None] | None = None
         self._live = False
+        self._scripted = False
         self._incident_id: str | None = None
         self._camera = ""
         self._address = ""
@@ -176,6 +177,8 @@ class VoiceAgent:
         """Demo recording: the on-screen 911 conversation. Does not dial."""
         if self.busy():
             return
+        self._update_q = asyncio.Queue()
+        self._scripted = True
         self._incident_id = rec.incident_id
         self._camera = rec.camera_id
         self._building = "Spartan Complex"
@@ -203,6 +206,7 @@ class VoiceAgent:
                 )
             await asyncio.sleep(3600)  # stay on the line until Reset
         finally:
+            self._scripted = False
             self._incident_id = None
 
     async def start_live_call(self, rec: IncidentRecord, brief: CallBrief) -> None:
@@ -373,7 +377,7 @@ class VoiceAgent:
             return
         if camera_id == self._camera:
             return
-        if self._live:
+        if self._live or self._scripted:
             await self._publish_update(camera_id, address)
         else:
             await self._update_q.put((camera_id, address))

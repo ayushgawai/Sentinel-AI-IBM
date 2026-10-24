@@ -322,6 +322,21 @@ async def _main() -> None:
     from services.voice.demo_call import DEMO_CALL as _LINES, speak_s, BEAT_S
 
     assert abs((_LINES[1][0] - _LINES[0][0]) - (speak_s(_LINES[0][2]) + BEAT_S)) < 0.02
+    # A connected scripted call must publish a real camera handoff immediately.
+    # Before this regression test, the handoff stayed in _update_q forever.
+    scripted_events.clear()
+    demo = VoiceAgent(scripted_pub, zrt=qwen)  # type: ignore[arg-type]
+    await demo.start_scripted_call(rec, assemble_call_brief(rec))
+    event_count = len(scripted_events)
+    await demo.notify_whereabouts("cam-02", assemble_call_brief(rec).address)
+    handoff_lines = [
+        getattr(event, "text", "") for event in scripted_events[event_count:]
+    ]
+    assert (
+        "Update: they have moved from the ground-floor lobby into the east corridor on the ground floor."
+        in handoff_lines
+    ), handoff_lines
+    await demo.cancel()
     assert DURATION > _LINES[-1][0]
 
     from services.voice.media_bridge import MediaStreamBridge

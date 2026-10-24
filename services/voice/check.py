@@ -312,12 +312,9 @@ async def _main() -> None:
     await asyncio.sleep(3.2)
     await demo.cancel()
     said = [(getattr(e, "speaker", ""), getattr(e, "text", "")) for e in scripted_events]
-    assert said[0] == ("sentinel", "Hi, this is Sentinel AI at San Jose State."), said
+    assert said[0] == ("dispatcher", "911, what's your emergency?"), said
     assert len(said) == 2, said
-    assert said[1] == (
-        "sentinel",
-        "I'm reporting armed people inside MacQuarrie Hall, One Washington Square.",
-    ), said
+    assert said[1] == ("sentinel", "Hi, this is Sentinel AI at San Jose State."), said
     script_blob = " ".join(text for _, text in said).lower()
     assert "simulat" not in script_blob and "psap" not in script_blob
     assert "deterministic" not in script_blob and "never emergency" not in script_blob
@@ -325,7 +322,7 @@ async def _main() -> None:
 
     # The recorded call's opening, at its own seconds after connect.
     assert _LINES[1] == OPENING[1]
-    assert [at_s for at_s, _, _ in _LINES[:4]] == [0.0, 3.12, 7.62, 10.7], _LINES
+    assert [at_s for at_s, _, _ in _LINES[:3]] == [0.0, 2.5, 5.62], _LINES
     assert not any("ibm" in text.lower() for _, _, text in _LINES), _LINES
 
     # A real camera handoff only updates internal call context. It must not

@@ -27,28 +27,66 @@ def answer(question: str, fallback: str) -> Callable[[float], str]:
     return lambda t: scene.answer(question, t) or fallback
 
 
-# (seconds after the call connects, speaker, text): video 22.48 s is 0.
+# (seconds after the call connects, speaker, text). The recorded call's
+# lines and gaps, with the dispatcher answering first.
 OPENING: list[tuple[float, str, Text]] = [
-    (0.00, "sentinel", "Hi, this is Sentinel AI at San Jose State."),
-    (3.12, "sentinel", f"I'm reporting armed people inside {PLACE}, One Washington Square."),
-    (7.62, "dispatcher", "911, what's your emergency?"),
-    (10.70, "sentinel", "One moment."),
-    (11.50, "sentinel", f"Armed people inside {PLACE} at San Jose State University."),
-    (16.20, "sentinel", answer("What weapons do they have?", "I see handguns and a knife in the ground-floor lobby.")),
-    (19.02, "dispatcher", "Okay, how many people do you see?"),
-    (21.58, "sentinel", "Give me a moment."),
-    (23.14, "sentinel", answer("How many people do you see?", "Eight people in the ground-floor lobby; six of them armed.")),
+    (0.00, "dispatcher", "911, what's your emergency?"),
+    (2.50, "sentinel", "Hi, this is Sentinel AI at San Jose State."),
+    (5.62, "sentinel", f"I'm reporting armed people inside {PLACE}, One Washington Square."),
+    (9.60, "sentinel", answer("What weapons do they have?", "I see handguns and a knife in the ground-floor lobby.")),
+    (12.42, "dispatcher", "Okay, how many people do you see?"),
+    (14.98, "sentinel", "Give me a moment."),
+    (16.54, "sentinel", answer("How many people do you see?", "Eight people in the ground-floor lobby; six of them armed.")),
 ]
 
-# (clip second, speaker, text). The 117 s exchange keeps the old call's
-# spacing before its update.
+# (clip second, speaker, text). Questions fill the stretches between camera
+# handoffs so the call never goes quiet; every answer is read off the scene
+# at that second. The 117 s exchange keeps the old call's spacing.
 ON_CLIP: list[tuple[float, str, Text]] = [
+    (30.0, "dispatcher", "Can you describe them?"),
+    (31.6, "sentinel", answer("Describe them.", "A group of men with handguns, and one with a knife.")),
+    (45.0, "dispatcher", "Is anyone hurt?"),
+    (46.4, "sentinel", answer("Is anyone hurt?", "No one appears injured, and no one is down on camera.")),
+    (51.0, "dispatcher", "Okay. Are they still in the lobby?"),
+    (52.6, "sentinel", "Yes, still in the ground-floor lobby. I'm tracking each of them across every camera."),
     (59.0, "sentinel", "One moment."),
+    (67.0, "dispatcher", "Which way are they heading?"),
+    (68.6, "sentinel", answer("Which way are they heading?", "They're in the east corridor on the ground floor now.")),
+    (77.0, "dispatcher", "How many are in the corridor?"),
+    (78.6, "sentinel", answer("How many people do you see?", "Two people in the east corridor on the ground floor.")),
+    (85.0, "dispatcher", "Describe the ones in the corridor."),
+    (86.6, "sentinel", answer("Describe them.", "Two men, one with a handgun and one with a knife.")),
+    (96.0, "dispatcher", "Okay, officers are on the way. Stay on the line."),
+    (98.8, "sentinel", "Understood. I'll stay on the line and report every camera change."),
     (105.0, "dispatcher", "Okay, what weapons do they have?"),
     (106.6, "sentinel", "Let me check that."),
     (107.6, "sentinel", answer("What weapons do they have?", "I see a handgun and a rifle in the east corridor on the ground floor.")),
     (113.0, "dispatcher", "Where are they now?"),
     (114.6, "sentinel", "They're in the east corridor on the ground floor."),
+    (125.0, "dispatcher", "How many in the west corridor?"),
+    (126.6, "sentinel", answer("How many people do you see?", "Two people in the west corridor near the stairwell.")),
+    (137.0, "dispatcher", "What weapons do you see there?"),
+    (138.6, "sentinel", answer("What weapons do they have?", "I see a handgun in the west corridor near the stairwell.")),
+    (150.0, "dispatcher", "Describe them for the officers."),
+    (151.6, "sentinel", answer("Describe them.", "A man with a rifle and a man in a light-blue shirt ahead of him.")),
+    (170.0, "dispatcher", "Officers are entering the building now. Keep me updated."),
+    (173.0, "sentinel", "Understood. I'm following them camera to camera."),
+    (185.0, "dispatcher", "Are they still on the west side?"),
+    (186.6, "sentinel", "Yes, still in the west corridor near the stairwell. I have them on camera."),
+    (197.0, "dispatcher", "Any update?"),
+    (198.6, "sentinel", answer("Any update?", "They're still in the west corridor near the stairwell.")),
+    (213.0, "dispatcher", "Is anyone hurt?"),
+    (214.4, "sentinel", answer("Is anyone hurt?", "No one appears injured, and no one is down on camera.")),
+    (221.0, "dispatcher", "Okay. Tell me the moment they move."),
+    (222.8, "sentinel", "Will do. Watching the west corridor now."),
+    (240.0, "dispatcher", "Where are they going?"),
+    (241.6, "sentinel", "They've turned back. They're in the east corridor on the ground floor, heading toward the lobby."),
+    (252.0, "dispatcher", "What weapons do you see now?"),
+    (253.6, "sentinel", answer("What weapons do they have?", "I see a handgun in the east corridor on the ground floor.")),
+    (280.0, "dispatcher", "How many in the lobby now?"),
+    (281.6, "sentinel", answer("How many people do you see?", "Two people in the ground-floor lobby.")),
+    (295.0, "dispatcher", "Which way are they heading?"),
+    (296.6, "sentinel", "They're back in the ground-floor lobby, the way they came in."),
 ] + [(float(t), "sentinel", scene.update_line(a, b)) for t, a, b in scene.moves(10_000)]
 ON_CLIP.sort(key=lambda line: line[0])
 
@@ -99,7 +137,19 @@ def _check() -> None:
     # Same wording as the recording, numbers from the footage at that second.
     assert scene.answer("What weapons do they have?", 24) == "I see four handguns and one knife in the ground-floor lobby."
     assert scene.answer("What weapons do they have?", 107.6) == "I see one handgun and one rifle in the east corridor on the ground floor."
-    assert scene.answer("How many people do you see?", 31).startswith("Eight people in the ground-floor lobby;")
+    assert scene.answer("How many people do you see?", 24).startswith("Eight people in the ground-floor lobby;")
+    # Every scene question resolves, and none names the old site.
+    for _, _, text in OPENING + ON_CLIP:
+        if not isinstance(text, str):
+            for t in (8.0, 31.6, 68.6, 151.6, 296.6):
+                assert "Spartan" not in text(t)
+    questions = ("Describe them.", "Is anyone hurt?", "Which way are they heading?", "How many people do you see?",
+                 "What weapons do they have?", "Any update?", "Where are they going?")
+    assert all(scene.intent(q) not in (None, "location", "identity", "address", "report") for q in questions)
+    # The call never goes quiet for more than 15 s (call connects at clip 2.2 on the wall).
+    lines = schedule(2.2)
+    quiet = max(b - a - speak_s(text) for (a, _, text), (b, _, _) in zip(lines, lines[1:]))
+    assert quiet < 15, quiet
     assert len(schedule(331.5)) == len(OPENING)  # past the last handoff: opening only
 
 

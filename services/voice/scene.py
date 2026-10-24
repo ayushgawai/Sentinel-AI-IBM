@@ -196,8 +196,10 @@ def answer(question: str, t: float) -> str | None:
         return f"Armed people inside {SITE}. I see {weapons_phrase(w)} in {location(s)}."
     if kind == "count":
         if armed:
+            if people == 1:
+                return f"One person in {location(s)}, and they're armed."
             return f"{num(people).capitalize()} people in {location(s)}; {num(min(armed, people) or armed)} of them armed."
-        return f"{num(people).capitalize()} people in {location(s)}, no weapon in view this second."
+        return f"{num(people).capitalize()} {'person' if people == 1 else 'people'} in {location(s)}, no weapon in view this second."
     if kind == "weapons":
         return f"I see {weapons_phrase(w)} in {location(s)}."
     if kind == "describe":
